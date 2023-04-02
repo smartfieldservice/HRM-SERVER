@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const faker = require("faker");
-const { clearKey } = require("../utils/cache");
+const { clearkey } = require("../utils/cache");
 const User = require("../models/ User");
 
 
@@ -70,7 +70,7 @@ const createUser = asyncHandler(async (req, res) => {
 
     try {
         const createUser = await user.save();
-        clearKey(User.collection.collectionName);
+        clearkey(User.collection.collectionName);
         res.json(createUser);
     }catch (error) {
         res.json({ message: error });

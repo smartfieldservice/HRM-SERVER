@@ -5,11 +5,11 @@ const util = require("util");
 const client = redis.createClient({
   host: process.env.REDIS_URI,
   port: process.env.REDIS_PORT,
-  retry_strategy: () => 1000,
-  legacyMode: true
+  retry_strategy: () => 1000
 });
 
-// client.hget = util.promisify(client.hget);
+
+client.hGetAll = util.promisify(client.hGetAll);
 const exec = mongoose.Query.prototype.exec;
 
 mongoose.Query.prototype.cache = function (options = { time: 60 }) {
