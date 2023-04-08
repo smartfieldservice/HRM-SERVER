@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const faker = require("faker");
 const { clearkey } = require("../utils/cache");
 const User = require("../models/ User");
+const generateToken = require("../utils/generateToken");
 
 
 //@desc Authorize user & get token
@@ -70,7 +71,7 @@ const createUser = asyncHandler(async (req, res) => {
 
     try {
         const createUser = await user.save();
-        clearkey(User.collection.collectionName);
+        // clearkey(User.collection.collectionName);
         res.json(createUser);
     }catch (error) {
         res.json({ message: error });
@@ -78,5 +79,6 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+    authUser,
     createUser,
 }
