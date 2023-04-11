@@ -78,7 +78,55 @@ const createUser = asyncHandler(async (req, res) => {
     }
 });
 
+//@desc   GET All Users
+//@route  GET /api/users
+//@access Private/Admin
+const getUsers = asyncHandler(async (req, res) => {
+    try{
+        
+        const users = await User.find({}).select("-password").sort({_id: -1 }); //newest first
+
+        res.json({ users });
+    }catch (error) {
+        res.json({ message: error });
+    }
+});
+
+//@desc get single user
+//@route GET /api/users/:id
+//@access Private/Admin
+const getSingle = asyncHandler(async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId).select("-password");
+        if (user == null) {
+            res.json({ message: "User not found" });
+        }else {
+            res.json(user);
+        }
+    }catch (error) {
+        res.json({ message: error });
+    }
+});
+
+//@desc Delete single user
+//@route GET /api/users/:id
+//@access Private/Admin
+const deleteUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.userId);
+
+    if(user) {
+        await User.deleteOne({ _id: user._id });
+        res.json({ message: "User delete successfully" });
+    }else{
+        res.status(404);
+        throw new Error("User not found");
+    }
+});
+
 module.exports = {
+    getSingle,
     authUser,
     createUser,
+    getUsers,
+    deleteUser,
 }
