@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
+    getUserProfile,
     getSingle,
     getUsers,
     authUser,
@@ -23,5 +24,10 @@ router
     .delete(deleteUser);
 //Login route for all user
 router.post("/login", authUser);
+
+//General user route for only get their profile and update their profile.
+router
+    .route("/profile")
+    .get(getUserProfile);
 
 module.exports = router;
