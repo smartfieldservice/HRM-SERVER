@@ -10,7 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, './.env') });
 connectDB();
 
 const app = express();
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 
 if(process.env.NODE_ENV === "development"){
