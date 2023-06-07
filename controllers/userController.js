@@ -1,6 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const faker = require("faker");
 const { clearkey } = require("../utils/cache");
+const fs = require('fs');
+const util = require('util');
+const unlinkfile = util.promisify(fs.unlink);
+const path = require('path');
+const { uploadFile } = require('../s3');
 const User = require("../models/ User");
 const generateToken = require("../utils/generateToken");
 
@@ -62,9 +67,22 @@ const createUser = asyncHandler(async (req, res) => {
         throw new Error("User Already Exists");
     }
 
-    const user = new User({
+    const file = req.file;
+    console.log('controler files ssssssdds' + file);
+    const result = await uploadFile(file);
+    await unlinkfile(file.path);
+
+    const user = await new User({
         name: req.body.name,
         email: req.body.email,
+        mobile: req.body.mobile,
+        department: req.body.department,
+        designation: req.body.designation,
+        presentaddress: req.body.presentaddress,
+        permanentaddress: req.body.permanentaddress,
+        city: req.body.city,
+        country: req.body.country,
+        imagePath: result.Location,
         password: req.body.password,
         role: req.body.role,
     });
@@ -72,6 +90,7 @@ const createUser = asyncHandler(async (req, res) => {
     try {
         const createUser = await user.save();
         // clearkey(User.collection.collectionName);
+        res.status(201);
         res.json(createUser);
     }catch (error) {
         res.json({ message: error });

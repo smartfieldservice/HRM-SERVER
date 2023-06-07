@@ -12,6 +12,35 @@ const userSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        mobile: {
+            type: String,
+            required: true
+        },
+        department: {
+            type: String,
+            required: true
+        },
+        designation: {
+            type: String,
+            required: true
+        },
+        presentaddress: {
+            type: String,
+            required: true,
+        },
+        permanentaddress: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        country: {
+            type: String
+        },
+        imagePath: {
+            type: String,
+            requried: [true, 'Please Add Employee Image']
+        },
         password: {
             type: String,
             required: true,
