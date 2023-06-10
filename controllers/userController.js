@@ -77,6 +77,7 @@ const createUser = asyncHandler(async (req, res) => {
         email: req.body.email,
         mobile: req.body.mobile,
         department: req.body.department,
+        employeeID: req.body.employeeID,
         designation: req.body.designation,
         presentaddress: req.body.presentaddress,
         permanentaddress: req.body.permanentaddress,

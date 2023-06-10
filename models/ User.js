@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        employeeID: {
+            type: String,
+            required: true
+        },
         designation: {
             type: String,
             required: true
