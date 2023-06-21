@@ -6,6 +6,7 @@ const logger = require('morgan');
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
+const departmentRoutes = require("./routes/departmentRoutes");
 
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 connectDB();
@@ -22,6 +23,7 @@ if(process.env.NODE_ENV === "development"){
 //@User Routes
 app.use("/api/users", userRoutes);
 app.use("/api/employee", employeeRoutes);
+app.use("/api/department", departmentRoutes);
 
 
 const PORT = process.env.PORT || 5000;

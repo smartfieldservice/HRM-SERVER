@@ -180,7 +180,6 @@ const getSingle = asyncHandler(async (req, res) => {
 //@access Private/Admin
 const deleteUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.userId);
-
     if(user) {
         await User.deleteOne({ _id: user._id });
         res.json({ message: "User delete successfully" });
