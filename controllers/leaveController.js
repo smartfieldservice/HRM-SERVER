@@ -34,4 +34,15 @@ const AllleaveData = asyncHandler(async(req, res) => {
     }
 });
 
-module.exports = { PostLeave, AllleaveData };
+const deleteLeave = asyncHandler(async (req, res) => {
+    const findleave = await Leave.findById(req.params.Id);
+    if(findleave){
+        await Leave.deleteOne({ _id: findleave._id });
+        res.json({ message: "Leave delete Successfully"});
+    }else{
+        res.status(404);
+        throw new Error("Leave not found");
+    }
+})
+
+module.exports = { PostLeave, AllleaveData, deleteLeave };

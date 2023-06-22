@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { PostLeave } = require("../controllers/leaveController");
+const { PostLeave, AllleaveData, deleteLeave } = require("../controllers/leaveController");
 
 router.route("/")
-    .post(PostLeave);
+    .post(PostLeave)
+    .get(AllleaveData);
 
+router.route("/:Id")
+    .delete(deleteLeave);
 
 module.exports = router;
