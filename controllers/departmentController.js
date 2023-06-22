@@ -33,11 +33,11 @@ const AllDepartment = asyncHandler(async(req, res) => {
 const deleteDepartment = asyncHandler(async (req, res) => {
     const user = await Department.findById(req.params.Id);
     if(user) {
-        await User.deleteOne({ _id: user._id });
-        res.json({ message: "User delete successfully" });
+        await Department.deleteOne({ _id: user._id });
+        res.json({ message: "Department delete successfully" });
     }else{
         res.status(404);
-        throw new Error("User not found");
+        throw new Error("Department not found");
     }
 });
 

@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
+const leaveRoutes = require("./routes/leaveRoutes");
 
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 connectDB();
@@ -24,6 +25,7 @@ if(process.env.NODE_ENV === "development"){
 app.use("/api/users", userRoutes);
 app.use("/api/employee", employeeRoutes);
 app.use("/api/department", departmentRoutes);
+app.use("/api/leave", leaveRoutes);
 
 
 const PORT = process.env.PORT || 5000;
