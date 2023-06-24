@@ -9,6 +9,13 @@ const leaveSchema = new mongoose.Schema(
         duration: {
             type: String,
         },
+        leavetype: {
+            type: String,
+            required: true
+        },
+        totaldays: {
+            type: String
+        },
         startdate: {
             type: String,
             required: true
@@ -19,16 +26,9 @@ const leaveSchema = new mongoose.Schema(
         },
         description: {
             type: String
-        },
-        status: {
-            type: String,
-            required: true
         }
     },
     {
         timestamps: true,
     }
 );
-
-const Leaves = mongoose.model("LeaveDetails", leaveSchema);
-module.exports = Leaves;

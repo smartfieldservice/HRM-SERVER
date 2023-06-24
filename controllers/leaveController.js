@@ -10,6 +10,8 @@ const PostLeave = asyncHandler(async (req, res) => {
     const leaveData = await new Leave({
         employeename: req.body.employeename,
         duration: req.body.duration,
+        leavetype: req.body.leavetype,
+        totaldays: req.body.totaldays,
         startdate: req.body.startdate,
         enddate: req.body.enddate,
         description: req.body.description,
