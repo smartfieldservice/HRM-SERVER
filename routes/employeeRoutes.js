@@ -4,7 +4,7 @@ const path = require('path');
 const multer = require('multer');
 const shortid = require('shortid');
 
-const { PostEmployee } = require('../controllers/employeeController');
+const { PostEmployee, editEmployee, searchEmployee } = require('../controllers/employeeController');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -27,5 +27,8 @@ router.route('/').post(upload.fields([{
   }, {
     name: 'documentPath', maxCount: 1
   }]), PostEmployee);
+
+router.route("/edit").put(editEmployee);
+router.route("/:emp").get(searchEmployee);
 
 module.exports = router;

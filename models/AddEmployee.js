@@ -44,5 +44,4 @@ const employeeSchema = new mongoose.Schema(
     }
 );
 
-const Employees = mongoose.model("EmployeeDetails", employeeSchema);
-module.exports = Employees;
+module.exports = mongoose.model("EmployeeDetails", employeeSchema);
