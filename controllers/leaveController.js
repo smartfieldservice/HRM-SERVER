@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const Leave = require('../models/LeaveModel');
+const Leave = require('../models/Leave');
 const { escapeString } = require('../utils/common');
 
 const searchLeave = async(req, res) => {

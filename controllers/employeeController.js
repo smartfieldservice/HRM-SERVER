@@ -4,7 +4,7 @@ const util = require('util');
 const unlinkfile = util.promisify(fs.unlink);
 const path = require('path');
 const { uploadFile } = require('../s3');
-const Employee = require('../models/AddEmployee');
+const Employee = require('../models/Employee');
 const { escapeString } = require('../utils/common');
 
 
@@ -12,6 +12,7 @@ const { escapeString } = require('../utils/common');
 // @access Private
 
 const searchEmployee = async(req, res) => {
+    
     try {
         const searchQuery = new RegExp(escapeString(req.params.emp),"i");
         const mobileQuery = new RegExp("^" + escapeString(req.params.emp),"i");
