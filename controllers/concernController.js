@@ -9,14 +9,11 @@ const { Concern } = require("../models/modelExporter");
 const { generateSlug, pagination } =require("../utils/common");
 const { uploadFile } = require('../s3');
 
-
 //@get concern
 //@access by super HR
 const allConcern = asyncHandler(async(req,res) => {
 
     try {
-
-        console.log("i am here")
 
         const { page, limit, sort} = req.query;
 
@@ -101,7 +98,7 @@ const editConcern = asyncHandler(async (req, res) => {
                     new : true
             });
 
-            res.status(200).json({ message : "Updated successfully" });
+            res.status(200).json({ message : "Edited successfully" });
         }
         
     } catch (error) {

@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        emargencyMobile : {
+            type: String,
+            required: true
+        },
         department: {
             type: String,
             required: true
@@ -43,11 +47,19 @@ const userSchema = new mongoose.Schema(
         },
         imagePath: {
             type: String,
-            requried: [true, 'Please Add Employee Image']
+            requried: true
         },
         password: {
             type: String,
             required: true,
+        },
+        concern : {
+            type : String,
+            ref : "concern"
+        },
+        department : {
+            type : String,
+            ref : "department"
         },
         role: {
             type: String,
@@ -73,6 +85,4 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);

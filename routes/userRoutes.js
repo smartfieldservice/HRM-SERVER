@@ -3,14 +3,7 @@ const router = express.Router();
 const path = require('path');
 const multer = require('multer');
 const shortid = require('shortid');
-const {
-    getUserProfile,
-    getSingle,
-    getUsers,
-    authUser,
-    createUser,
-    deleteUser,
-    updateUserProfile } = require("../controllers/userController");
+const { userController } = require("../controllers/controllerExporter");
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -30,10 +23,12 @@ const upload = multer({ storage: storage,
 //@Admin only create user and get All User.
 router
     .route("/")
-    .post(upload.single("imagePath"),createUser)
-    .get(getUsers);
+    .get(userController.allUsers)
+    .post(upload.single("imagePath"),userController.createUser)
+    .put(userController.editUser)
+    .delete(userController.deleteUser)
 
-//Admin route for single get, put, delete user.
+/* //Admin route for single get, put, delete user.
 router
     .route("/profile/:userId")
     .get(getSingle)
@@ -45,6 +40,6 @@ router.post("/login", authUser);
 router
     .route("/profile")
     .get(getUserProfile)
-    .put(updateUserProfile);
+    .put(updateUserProfile); */
 
 module.exports = router;

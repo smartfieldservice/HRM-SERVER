@@ -1,6 +1,9 @@
 const asyncHandler = require('express-async-handler');
-const Department = require('../models/Department');
-const { escapeString } = require('../utils/common');
+const { Department } = require('../models/modelExporter');
+const { escapeString, 
+        generateSlug, 
+        pagination } = require('../utils/common');
+const { isValidObjectId } = require('mongoose');
 
 
 // @desc Post Employee
@@ -14,11 +17,11 @@ const searchDeparment = async(req, res) => {
         const searchQuery = new RegExp(escapeString(req.params.dep));
 
         if(req.params.dep !== ""){
-            const departmentData = await Department.find({
+            const department = await Department.find({
                 $or : [{departmentName : searchQuery }]
             });
 
-            res.status(201).json({message : `${departmentData} department found !`,departmentData});
+            res.status(201).json({message : `${department} department found !`,department});
         }
 
     } catch (error) {
@@ -26,61 +29,116 @@ const searchDeparment = async(req, res) => {
     }
 }
 
-// @desc add new Depratment
-// @access Private
 
-const PostDepartment = asyncHandler(async (req, res) => {
-    const DepartmentData = new Department({
-        departmentName: req.body.departmentName,
-        Description: req.body.Description
-    });
-    try{
-        const DepartmentForm = await DepartmentData.save();
-        res.status(201);
-        res.json(DepartmentForm);
-    }catch(err){
-        res.json({ message: err });
+const concernWiseDepartment = asyncHandler(async(req, res) => {
+
+    try {
+
+        if(!isValidObjectId(req.query.id)){
+
+            res.status(409).json({ message : "Invalid object Id" });
+        
+        }
+        else{
+
+            const departments = await Department.find({ concernId : req.query.id });
+
+            res.status(200).json({ message : `${departments.length} departments found`, data : departments });
+        }
+    
+    } catch (error) {
+        res.status(400).json({ message: error.message });
     }
+
 });
 
 // @desc all Depratment
-// @access Private
+// @access super HR
 
-const AllDepartment = asyncHandler(async(req, res) => {
+const allDepartment = asyncHandler(async(req, res) => {
+    
     try{
-        const departmentalldata = await Department.find();
-        res.status(200);
-        res.json(departmentalldata);
+
+        const { page, limit, sort} = req.query;
+
+        let departments = Department.find({});
+
+        let sortBy = "-createdAt";
+        if(sort){
+            sortBy = sort.replace(","," ");
+        }
+
+        departments = await pagination(page, limit, departments);
+
+        res.status(200).json({ message : `${departments.length} departments found`, data : departments });
+
     }catch(error){
         res.json({ message: error});
     }
 });
 
+// @add new Depratment
+// @access super HR
+const  createDepartment = asyncHandler(async (req, res) => {
 
-// @desc edit Depratment
-// @access Private
+    try {
 
+        const { concernId, name, description } = req.body;
+
+        const slug = generateSlug(name);
+
+        let department = await Department.findOne({ slug });
+
+        if(department){
+            res.status(409).json({ message : "Already exist" });
+        }else{
+
+            department = new Department({
+                concernId,
+                name,
+                description,
+                slug
+            });
+
+            await department.save();
+            res.status(200).json({ message : "Added successfully", department });
+        }
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });
+    }
+
+    
+});
+
+// @edit Depratment
+// @access Super HR
 const editDepartment = async(req, res) => {
     
     try {
 
-        const departmentData = await Department.findOne({_id : req.query.Id});
+        let department = await Department.findById({ _id : req.query.id });
+        
+        if(!department){
+            res.status(404).json({ message : "Not found" });
+        }  
+        else{
 
-        if(departmentData){
+            const { concernId, name, description } = req.body;
 
-            const editDepartment = await Department.findByIdAndUpdate({
-                    _id : req.query.Id
+            await Department.findByIdAndUpdate({
+                    _id : req.query.id
                 },{
-                    departmentName: req.body.departmentName,
-                    Description: req.body.Description
+                    concernId,
+                    name,
+                    description,
+                    slug : generateSlug(name)
                 },{
                     new : true
             });
 
-            res.status(201).json({message : "Edited Successfully !", editDepartment});
+            res.status(200).json({message : "Edited Successfully !"});
 
-        }else{
-            throw new Error("Data not found !");
         }
 
     } catch (error) {
@@ -103,8 +161,9 @@ const deleteDepartment = asyncHandler(async (req, res) => {
 });
 
 
-module.exports = { PostDepartment, 
-                    AllDepartment, 
+module.exports = {  createDepartment, 
+                    concernWiseDepartment ,
+                    allDepartment, 
                     deleteDepartment, 
                     editDepartment, 
                     searchDeparment 

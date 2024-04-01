@@ -1,16 +1,24 @@
-const mongoose = require("mongoose");
+const { mongoose, Schema } = require("mongoose");
 
 const departmentSchema = new mongoose.Schema(
     {
-        departmentName: {
+        concernId : {
+            type : Schema.ObjectId,
+            ref : "concern",
+            required : true
+        },
+        name: {
             type: String,
             required: true,
         },
-        Description: {
+        description: {
             type: String,
+        },
+        slug : {
+            type : String
         }
     }
 );
 
-const User = mongoose.model("Department", departmentSchema);
-module.exports = User;
+//@exports
+module.exports = mongoose.model("department", departmentSchema);

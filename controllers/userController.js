@@ -8,6 +8,8 @@ const path = require('path');
 const { uploadFile } = require('../s3');
 const User = require("../models/ User");
 const generateToken = require("../utils/generateToken");
+const { pagination } = require("../utils/common");
+const { isValidObjectId } = require("mongoose");
 
 
 //@desc Authorize user & get token
@@ -54,47 +56,125 @@ const generateUsers = asyncHandler(async (req, res) => {
     }
 });
 
-
-//@desc Create New User
-//@route POST /API/USERS
+//@http://localhost:8000/api/users
 //@ACCESS Private/Admin
-const createUser = asyncHandler(async (req, res) => {
-    const { email } = req.body;
-    const userExists = await User.findOne({ email });
-
-    if(userExists) {
-        res.status(400);
-        throw new Error("User Already Exists");
-    }
-
-    const file = req.file;
-    console.log('controler files ssssssdds' + file);
-    const result = await uploadFile(file);
-    await unlinkfile(file.path);
-
-    const user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        mobile: req.body.mobile,
-        department: req.body.department,
-        employeeID: req.body.employeeID,
-        designation: req.body.designation,
-        presentaddress: req.body.presentaddress,
-        permanentaddress: req.body.permanentaddress,
-        city: req.body.city,
-        country: req.body.country,
-        imagePath: result.Location,
-        password: req.body.password,
-        role: req.body.role,
-    });
+const allUsers = asyncHandler(async(req, res) => {
 
     try {
-        const createUser = await user.save();
-        // clearkey(User.collection.collectionName);
-        res.status(201);
-        res.json(createUser);
-    }catch (error) {
-        res.json({ message: error });
+
+        let { page, limit } = req.query;
+
+        let users = User.find({});
+
+        users = await pagination(page, limit, users);
+
+        res.status(200).json({ message : `${users.length} users found`, data : users });
+        
+    } catch (error) {
+        res.status(400).json({ message : error.message });
+    }
+
+});
+
+//@desc Create New User
+//@http://localhost:8000/api/users
+//@ACCESS Private/Admin
+const createUser = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { name, email, mobile, emargencyMobile, department, employeeID, designation, presentaddress, permanentaddress, city, country, password, role } = req.body;
+
+        let user = await User.findOne({ email });
+
+        if(user){
+            res.status(409).json({ message : "Already exist" });
+        }
+        else{
+
+            const file = req.file;
+            const result = await uploadFile(file);
+            await unlinkfile(file.path);
+                
+            user = new User({
+                name,
+                email,
+                mobile,
+                emargencyMobile,
+                department,
+                employeeID,
+                designation,
+                presentaddress,
+                permanentaddress,
+                city,
+                country,
+                password,
+                role,
+                imagePath : result.Location
+            });
+
+            await user.save();
+
+            res.status(200).json({ message : "Added successfully", user });
+
+        }
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });
+    }
+
+});
+
+//@desc Update user profile
+//@http://localhost:8000/api/users?id=
+//@access Private
+const editUser = asyncHandler(async (req, res) => {
+
+    try {
+
+        if(!isValidObjectId(req.query.id)){
+
+            res.status(409).json({ message : "Invalid object Id" });
+        
+        }else{
+
+            const user = await User.findById({ _id : req.query.id });
+
+            if(user){
+                
+
+                
+            }else{
+                res.status(404).json({ message: "Not found" });
+            }
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+//@desc Delete single user
+//@http://localhost:8000/api/users?id=
+//@access Private/Admin
+const deleteUser = asyncHandler(async (req, res) => {
+
+    try {
+
+        if(!isValidObjectId(req.query.id)){
+            res.status(409).json({ message : "Invalid object Id" });
+        }else{
+
+            const user = await User.findById({ _id : req.query.id });
+
+            if(user){
+                await User.findByIdAndDelete({ _id : req.query.id });
+                res.json({ message: "User delete successfully" });
+            }else{
+                res.status(404).json({ message: "Not found" });
+            }
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
     }
 });
 
@@ -118,32 +198,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 
-//@desc Update user profile
-//@route PUT /api/users/profile
-//@access Private
-const updateUserProfile = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
 
-    if(user){
-        user.name = req.body.name || user.name;
-        user.email = req.body.email || user.email;
-        if(req.body.password) {
-            user.password = req.body.password;
-        }
-
-        const updatedUser = await user.save();
-        res.json({
-            _id: updatedUser._id,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            role: updatedUser.role,
-            token: generateToken(updatedUser._id),
-        });
-    } else {
-        res.status(404);
-        throw new Error("User not found");
-    }
-})
 
 //@desc   GET All Users
 //@route  GET /api/users
@@ -175,26 +230,14 @@ const getSingle = asyncHandler(async (req, res) => {
     }
 });
 
-//@desc Delete single user
-//@route GET /api/users/:id
-//@access Private/Admin
-const deleteUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.userId);
-    if(user) {
-        await User.deleteOne({ _id: user._id });
-        res.json({ message: "User delete successfully" });
-    }else{
-        res.status(404);
-        throw new Error("User not found");
-    }
-});
 
-module.exports = {
-    getUserProfile,
-    getSingle,
-    authUser,
-    createUser,
-    getUsers,
-    deleteUser,
-    updateUserProfile
-}
+
+module.exports = {  allUsers,
+                    getUserProfile,
+                    getSingle,
+                    authUser,
+                    createUser,
+                    getUsers,
+                    deleteUser,
+                    editUser
+                }
