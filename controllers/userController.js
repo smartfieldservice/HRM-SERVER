@@ -7,9 +7,7 @@ const unlinkfile = util.promisify(fs.unlink);
 const path = require('path');
 const { uploadFile } = require('../s3');
 const User = require("../models/ User");
-const Concern = require("../models/Concern");
 const generateToken = require("../utils/generateToken");
-const { generateSlug } = require("../utils/common");
 
 
 //@desc Authorize user & get token
@@ -74,7 +72,7 @@ const createUser = asyncHandler(async (req, res) => {
     const result = await uploadFile(file);
     await unlinkfile(file.path);
 
-    const user = await new User({
+    const user = new User({
         name: req.body.name,
         email: req.body.email,
         mobile: req.body.mobile,
@@ -191,72 +189,6 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 });
 
-//@create concern
-//@access by super HR
-const createConcern = asyncHandler(async (req, res) => {
-   
-    try {
-        
-        const { concernName, address } = req.body;
-
-        const slug = generateSlug(concernName);
-        
-        let concern = await Concern.findOne({ slug });
-
-        if(concern){
-            res.status(409).json({ message : "Already exist" });
-        }else{
-
-            const file = req.file;
-            const result = await uploadFile(file);
-            await unlinkfile(file.path);
-
-            concern = new Concern({
-                concernName,
-                address,
-                logo : result.Location,
-                slug
-            });
-            await concern.save();
-            res.status(200).json({ message : "Added successfully", concern });
-        }
-
-    } catch (error) {
-        res.status(400).json({ message : error.message });
-    }
-});
-
-//@edit concern
-//@access by super HR
-const editConcern = asyncHandler(async (req, res) => {
-    
-    try {
-
-        let concern = await Concern.findById({ _id : req.query.id });
-
-        if(!concern){
-            res.status(404).json({ message : "Not found" });
-        }else{
-            const { concernName, address } = req.body;
-
-            await Concern.findByIdAndUpdate({ 
-                    _id : req.query.id
-                },{
-                    concernName,
-                    address,
-                    slug : generateSlug(concernName)
-                },{ 
-                    new : true
-            });
-
-            res.status(200).json({ message : "Updated successfully" });
-        }
-        
-    } catch (error) {
-        res.status(400).json({ message : error.message });
-    }
-});
-
 module.exports = {
     getUserProfile,
     getSingle,
@@ -264,8 +196,5 @@ module.exports = {
     createUser,
     getUsers,
     deleteUser,
-    updateUserProfile,
-    createConcern,
-    editConcern
-
+    updateUserProfile
 }

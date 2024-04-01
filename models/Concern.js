@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const concernSchema = mongoose.Schema({
     
-    concernName : {
+    name : {
         type : String,
         required : true
     },
@@ -11,6 +11,9 @@ const concernSchema = mongoose.Schema({
         required : true
     },
     logo : {
+        type : String
+    },
+    description : {
         type : String
     },
     slug : {

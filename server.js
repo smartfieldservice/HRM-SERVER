@@ -14,6 +14,7 @@ const leaveRoutes = require("./routes/leaveRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const adminRoutes = require("./routes/adminRoute");
 const documentRoutes = require("./routes/documentRoute");
+const concernRoute = require("./routes/concernRoute");
 
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 connectDB();
@@ -35,5 +36,6 @@ app
   .use("/api/leave", leaveRoutes)
   .use("/api/expense", expenseRoutes)
   .use("/api/document", documentRoutes)
+  .use("/api/concern", concernRoute)
 
 app.listen(process.env.PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}!`));
