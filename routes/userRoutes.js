@@ -28,15 +28,15 @@ router
     .put(userController.editUser)
     .delete(userController.deleteUser)
 
-/* //Admin route for single get, put, delete user.
-router
+//Admin route for single get, put, delete user.
+/* router
     .route("/profile/:userId")
     .get(getSingle)
     .delete(deleteUser);
-//Login route for all user
-router.post("/login", authUser);
+//Login route for all user */
+router.post("/login", userController.authUser);
 
-//General user route for only get their profile and update their profile.
+/* //General user route for only get their profile and update their profile.
 router
     .route("/profile")
     .get(getUserProfile)

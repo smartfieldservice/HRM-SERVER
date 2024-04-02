@@ -1,13 +1,9 @@
 //@external module
 const asyncHandler = require("express-async-handler");
-const fs = require('fs');
-const util = require('util');
-const unlinkfile = util.promisify(fs.unlink);
 
 //@internal module
 const { Concern } = require("../models/modelExporter");
 const { generateSlug, pagination } =require("../utils/common");
-const { uploadFile } = require('../s3');
 
 //@get concern
 //@access by super HR
@@ -42,9 +38,8 @@ const createConcern = asyncHandler(async (req, res) => {
    
     try {
         
+        console.log(req.file)
         const { name, address, description } = req.body;
-
-        console.log(name)
 
         const slug = generateSlug(name);
         
@@ -54,14 +49,10 @@ const createConcern = asyncHandler(async (req, res) => {
             res.status(409).json({ message : "Already exist" });
         }else{
 
-            const file = req.file;
-            const result = await uploadFile(file);
-            await unlinkfile(file.path);
-
             concern = new Concern({
                 name ,
                 address ,
-                logo : result.Location ,
+                logo : req.file.location,
                 slug ,
                 description
             });
