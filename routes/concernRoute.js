@@ -15,6 +15,7 @@ router
     .route("/")
     .get(concernController.allConcern)
     .post(upload.single('logo'), concernController.createConcern)
-    .put(concernController.editConcern) 
+    .put(concernController.editConcern)
+    .delete(concernController.deleteConcern)
 
 module.exports = router

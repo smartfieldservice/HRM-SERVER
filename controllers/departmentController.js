@@ -36,7 +36,7 @@ const concernWiseDepartment = asyncHandler(async(req, res) => {
 
         if(!isValidObjectId(req.query.id)){
 
-            res.status(409).json({ message : "Invalid object Id" });
+            res.status(409).json({ message : "Invalid department Id" });
         
         }
         else{
