@@ -1,9 +1,13 @@
+//@external module
 const asyncHandler = require('express-async-handler');
+const { isValidObjectId } = require('mongoose');
+
+//@internal module
 const { Department } = require('../models/modelExporter');
 const { escapeString, 
         generateSlug, 
         pagination } = require('../utils/common');
-const { isValidObjectId } = require('mongoose');
+
 
 
 // @desc Post Employee
@@ -29,7 +33,8 @@ const searchDeparment = async(req, res) => {
     }
 }
 
-
+//@http://localhost:8000/api/department/concern?id=<concern_id>
+//@access Private
 const concernWiseDepartment = asyncHandler(async(req, res) => {
 
     try {
@@ -117,28 +122,37 @@ const editDepartment = async(req, res) => {
     
     try {
 
-        let department = await Department.findById({ _id : req.query.id });
+        if(!isValidObjectId(req.query.id)){
+
+            res.status(409).json({ message : "Invalid department Id" });
+
+        }else{
+
+            let department = await Department.findById({ _id : req.query.id });
         
-        if(!department){
-            res.status(404).json({ message : "Not found" });
-        }  
-        else{
+            if(!department){
 
-            const { concernId, name, description } = req.body;
+                res.status(404).json({ message : "Not found" });
+            
+            }  
+            else{
 
-            await Department.findByIdAndUpdate({
-                    _id : req.query.id
-                },{
-                    concernId,
-                    name,
-                    description,
-                    slug : generateSlug(name)
-                },{
-                    new : true
-            });
+                const { concernId, name, description } = req.body;
 
-            res.status(200).json({message : "Edited Successfully !"});
+                await Department.findByIdAndUpdate({
+                        _id : req.query.id
+                    },{
+                        concernId,
+                        name,
+                        description,
+                        slug : generateSlug(name)
+                    },{
+                        new : true
+                });
 
+                res.status(200).json({message : "Edited Successfully !"});
+
+            }
         }
 
     } catch (error) {
@@ -148,23 +162,36 @@ const editDepartment = async(req, res) => {
 
 // @desc delete Depratment
 // @access Private
-
 const deleteDepartment = asyncHandler(async (req, res) => {
-    const user = await Department.findById(req.params.Id);
-    if(user) {
-        await Department.deleteOne({ _id: user._id });
-        res.json({ message: "Department delete successfully" });
-    }else{
-        res.status(404);
-        throw new Error("Department not found");
+
+    try {
+
+        if(!isValidObjectId(req.query.id)){
+
+            res.status(409).json({ message : "Invalid department Id" });
+
+        }else{
+
+            const department = await Department.findById({ _id : req.query.id });
+
+            if(!department){
+                res.status(404).json({ message : "Not found" });
+            }else{
+                await Department.findByIdAndDelete({ _id : req.query.id });
+                res.status(200).json({ message : "Deleted successfully" });
+            }
+        }        
+    }catch(error){
+        res.status(400).json({ message : error.message });
     }
+
 });
 
 
-module.exports = {  createDepartment, 
-                    concernWiseDepartment ,
-                    allDepartment, 
-                    deleteDepartment, 
-                    editDepartment, 
-                    searchDeparment 
+module.exports = {  searchDeparment, 
+                    concernWiseDepartment,
+                    allDepartment,
+                    createDepartment, 
+                    editDepartment,
+                    deleteDepartment
                 };

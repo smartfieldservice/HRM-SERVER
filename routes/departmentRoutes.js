@@ -12,6 +12,7 @@ router
     .get(departmentController.allDepartment)
     .post(departmentController.createDepartment)
     .put(departmentController.editDepartment)
+    .delete(departmentController.deleteDepartment)
     
 
 module.exports = router;

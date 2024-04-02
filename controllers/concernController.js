@@ -1,10 +1,10 @@
 //@external module
 const asyncHandler = require("express-async-handler");
+const { isValidObjectId } = require("mongoose");
 
 //@internal module
 const { Concern } = require("../models/modelExporter");
 const { generateSlug, pagination } =require("../utils/common");
-const { isValidObjectId } = require("mongoose");
 
 //@get all concern
 //@access by super HR
@@ -135,7 +135,7 @@ const deleteConcern = asyncHandler(async(req, res) => {
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
-    
+
 });
 
 module.exports = {  allConcern,
