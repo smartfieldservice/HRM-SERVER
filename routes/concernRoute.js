@@ -13,7 +13,7 @@ const upload = multer({
 });
 
 router
-    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr','branch-hr']));
+    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr']));
 router
     .route("/")
     .get(concernController.allConcern)
