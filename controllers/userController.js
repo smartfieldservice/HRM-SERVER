@@ -12,50 +12,6 @@ const { pagination } = require("../utils/common");
 const { isValidObjectId } = require("mongoose");
 
 
-//@desc Authorize user & get token
-//@route POST /api/users/login
-//@access Public
-const authUser = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (user && (await user.matchPassword(password))){
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            token: generateToken(user._id),
-        });
-    } else {
-        res.status(401);
-        throw new Error("Invalid email or password");
-    }
-});
-
-//@desc Generate Many new Users
-const generateUsers = asyncHandler(async (req, res) => {
-    let users = [];
-    for (let i = 0; i< 10; i +=1){
-        const name = faker.name.findName();
-
-        let newUser = {
-            name,
-            email: faker.internet.email(name),
-            password: "pass12345",
-            role: faker.random.arrayElement(["admin", "hrm", "employee"])
-        };
-        users.push(newUser);
-    }
-
-    try {
-        const createUsers = await User.insertMany(users);
-        res.json(createUsers);
-    }catch (error) {
-        res.json({ message: error });
-    }
-});
-
 //@http://localhost:8000/api/users
 //@ACCESS Private/Admin
 const allUsers = asyncHandler(async(req, res) => {
@@ -178,6 +134,51 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 });
 
+//@desc Authorize user & get token
+//@route POST /api/users/login
+//@access Public
+const authUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (user && (await user.matchPassword(password))){
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id),
+        });
+    } else {
+        res.status(401);
+        throw new Error("Invalid email or password");
+    }
+});
+
+//@desc Generate Many new Users
+const generateUsers = asyncHandler(async (req, res) => {
+    let users = [];
+    for (let i = 0; i< 10; i +=1){
+        const name = faker.name.findName();
+
+        let newUser = {
+            name,
+            email: faker.internet.email(name),
+            password: "pass12345",
+            role: faker.random.arrayElement(["admin", "hrm", "employee"])
+        };
+        users.push(newUser);
+    }
+
+    try {
+        const createUsers = await User.insertMany(users);
+        res.json(createUsers);
+    }catch (error) {
+        res.json({ message: error });
+    }
+});
+
+
 //@desc Get user profile
 //@route GET /api/users/profile
 //@access Private
@@ -233,11 +234,11 @@ const getSingle = asyncHandler(async (req, res) => {
 
 
 module.exports = {  allUsers,
+                    createUser,
+                    editUser,
+                    deleteUser,
                     getUserProfile,
                     getSingle,
                     authUser,
-                    createUser,
-                    getUsers,
-                    deleteUser,
-                    editUser
+                    getUsers
                 }
