@@ -34,7 +34,7 @@ router
     .get(getSingle)
     .delete(deleteUser);
 //Login route for all user */
-router.post("/login", userController.authUser);
+router.post("/login", userController.loginUser);
 
 /* //General user route for only get their profile and update their profile.
 router
