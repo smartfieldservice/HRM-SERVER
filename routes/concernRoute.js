@@ -5,12 +5,15 @@ const multer = require('multer');
 
 //@internal module
 const { concernController } = require("../controllers/controllerExporter");
-const { s3Handler } = require("../middlewares/middlwareExporter");
+const { s3Handler, 
+        accountValidation } = require("../middlewares/middlwareExporter");
 
 const upload = multer({
     storage : s3Handler.storageConfig
 });
 
+router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr','branch-hr']));
 router
     .route("/")
     .get(concernController.allConcern)

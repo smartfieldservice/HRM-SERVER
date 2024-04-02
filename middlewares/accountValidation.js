@@ -1,21 +1,32 @@
 //@internal module
-const { verifyAuthToken, decodeAccount } = require("../utils/common");
+const { verifyAuthToken } = require("../utils/common");
 
 //@check is that requested account is logged in or not
 const isLogin  = async(req, res, next) => {
+    
     try {
 
-        //verify that this auth-token exist or not
-        const verified = verifyAuthToken(req.headers['authtoken']);
+        //@get the authToken from Bearer Token
+        let authToken = req.get('Authorization');
 
-        if(verified){
+        if(authToken){
 
-            //decode the token data
-            const decoded = decodeAccount(req.headers['authtoken']);
+            //@for user validation
+            authToken = authToken.split(' ')[1];
+            authToken = verifyAuthToken(authToken)
 
-            //attach the token data to the request
-            req.account = decoded.data;
-            next();
+            if(authToken){
+
+                //@create an account to attach the data of the current user
+                req.account = authToken;
+                //console.log(req.account)
+                next();
+            }
+            else {
+                res.status(404).json({ message: "Invalid user" });
+            }
+        }else{
+            res.status(404).json({ message: "Invalid Token" });
         }
 
     } catch (error) {
@@ -28,25 +39,16 @@ const requiredRole = function(roleArray){
     
     try {
 
-        return function(req, res, next) {
+        return function(req, res, next){
 
-            if(req.account){
-
-                if(roleArray[0] === "Admin"){
-                    //for all types of admin
-                    next();
-                }
-                else if(roleArray.includes(req.account.role)){
-                    //only individual admin
-                    next();
-                }
-                else{
-                    res.status(400).json({message:"Invalid Permission !"});
-                }
+            //check if the role is valid to access the route
+            if(req.account && roleArray.includes(req.account.role)){
+                next();
             }else{
-                res.status(400).json({message:"Invalid Permission !"});
+                throw responseHandler.newError(401);
             }
         }
+        
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }

@@ -46,11 +46,9 @@ const varifyPassword = async(inputPassword, hashPassword) => {
 }
 
 //@function for create an Authentication token for an account using jwt
-const createAuthToken = function(payload){
-    return jwt.sign(payload, process.env.JWT_SECRET,{
-        expiresIn:process.env.JWT_EXPIRITY
-    });
-}
+const generateAuthToken = (id,role) => {
+    return jwt.sign({ id,role }, process.env.JWT_SECRET, { expiresIn: "14d" });
+};
 
 //@function for verify Authentication token of an account using jwt
 const verifyAuthToken = function(authToken){
@@ -157,7 +155,7 @@ module.exports = {  escapeString,
                     pagination,
                     hashedPassword,
                     varifyPassword,
-                    createAuthToken,
+                    generateAuthToken,
                     verifyAuthToken,
                     decodeAccount,
                     filesArray,

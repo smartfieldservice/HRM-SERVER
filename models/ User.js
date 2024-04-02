@@ -63,11 +63,18 @@ const userSchema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ["admin", "hrm", "employee"],
+            enum: ["hr", "branch-hr", "employee"],
             required: true,
         },
     },
     {
+        toJSON : {
+            transform : function(doc, ret){
+                delete ret.password;
+                delete ret.createdAt;
+                delete ret.updatedAt;
+            }
+        },
         timestamps: true,
     }
 );

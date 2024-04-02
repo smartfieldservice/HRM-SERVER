@@ -7,8 +7,7 @@ const unlinkfile = util.promisify(fs.unlink);
 const path = require('path');
 const { uploadFile } = require('../s3');
 const User = require("../models/ User");
-const generateToken = require("../utils/generateToken");
-const { pagination } = require("../utils/common");
+const { pagination, generateAuthToken } = require("../utils/common");
 const { isValidObjectId } = require("mongoose");
 
 
@@ -151,7 +150,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: generateToken(user._id),
+                token: generateAuthToken(user._id,user.role),
             });
         } else {
             res.status(401).json({ message:"Invalid email or password"});
@@ -191,6 +190,7 @@ const generateUsers = asyncHandler(async (req, res) => {
 //@route GET /api/users/profile
 //@access Private
 const getUserProfile = asyncHandler(async (req, res) => {
+
     const user = await User.findById(req.user._id).select("-password");
 
     if (user) {
@@ -205,9 +205,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
         throw new Error("User not found");
     }
 });
-
-
-
 
 //@desc   GET All Users
 //@route  GET /api/users
