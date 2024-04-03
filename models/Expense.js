@@ -21,6 +21,16 @@ const expenseSchame = mongoose.Schema({
         type : String,
         required : true,
     }
-},{timestamps : true});
+},{
+    toJSON : {
+        transform : function(doc, ret){
+            delete ret.__v;
+            delete ret.createdAt;
+            delete ret.updatedAt;
+        }
+    },
+    timestamps : true
+});
 
+//@exports
 module.exports = mongoose.model("Expense",expenseSchame);

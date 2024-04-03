@@ -29,9 +29,16 @@ const leaveSchema = new mongoose.Schema(
         }
     },
     {
+        toJSON : {
+            transform : function(doc, ret){
+                delete ret.__v;
+                delete ret.createdAt;
+                delete ret.updatedAt;
+            }
+        },
         timestamps: true,
     }
 );
 
-const Leave = mongoose.model("Leave", leaveSchema);
-module.exports = Leave;
+//@exports
+module.exports= mongoose.model("Leave", leaveSchema);
