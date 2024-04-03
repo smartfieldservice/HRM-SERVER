@@ -17,6 +17,15 @@ const departmentSchema = new mongoose.Schema(
         slug : {
             type : String
         }
+    },{
+        toJSON : {
+            transform : function(doc, ret){
+                delete ret.__v;
+                delete ret.createdAt;
+                delete ret.updatedAt;
+            }
+        },
+        timestamps : true
     }
 );
 

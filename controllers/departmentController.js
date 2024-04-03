@@ -64,9 +64,10 @@ const allDepartment = asyncHandler(async(req, res) => {
     
     try{   
 
-        const concern = await Concern.findOne({ slug : req.account.concern }).select("_id");
-
-        const { page, limit, sort} = req.query;
+        const concern = undefined; 
+        
+        //@after giving the role then use it as concern
+        //await Concern.findOne({ slug : req.account.concern }).select("_id");
 
         let departments;
 
@@ -78,12 +79,16 @@ const allDepartment = asyncHandler(async(req, res) => {
             departments = Department.find({ concernId : concern });
         }
         
+        departments = departments.populate({ path : 'concernId', select : ['name']});
+        
         let sortBy = "-createdAt";
-        if(sort){
-            sortBy = sort.replace(","," ");
+        if(req.query.sort){
+            sortBy = req.query.sort.replace(","," ");
         }
 
-        departments = await pagination(page, limit, departments);
+        departments = departments.sort(sortBy);
+
+        departments = await pagination(req.query.page, req.query.limit, departments);
 
         res.status(200).json({ message : `${departments.length} departments found`, data : departments });
 

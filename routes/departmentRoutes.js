@@ -4,9 +4,9 @@ const router = express.Router();
 const { departmentController } = require("../controllers/controllerExporter");
 const { accountValidation } = require("../middlewares/middlwareExporter");
 
-router
+/* router
     .use(accountValidation.isLogin,accountValidation.requiredRole(['hr','branch-hr']))
-
+ */
 router
     .route("/concern/")
     .get(departmentController.concernWiseDepartment);
