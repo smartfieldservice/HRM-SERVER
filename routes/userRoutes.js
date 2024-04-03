@@ -1,45 +1,40 @@
+//@external module
 const express = require("express");
 const router = express.Router();
-const path = require('path');
 const multer = require('multer');
-const shortid = require('shortid');
+
+//@internal module
 const { userController } = require("../controllers/controllerExporter");
+const { s3Handler, accountValidation } = require("../middlewares/middlwareExporter");
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null, path.join(path.dirname(__dirname), './AllFileFolder'))
-    },
-    filename: function(req, file, cb){
-        cb(null, shortid.generate() + '-' + file.originalname);
-    }
-});
-
-const upload = multer({ storage: storage,
-    limits: {
-        fileSize: 99995242880 // 500KB
-    }
+const upload = multer({
+    storage : s3Handler.storageConfig
 });
 
 //@Admin only create user and get All User.
 router
     .route("/")
+    //@api/users?page=&limit=&sort=
     .get(userController.allUsers)
-    .post(upload.single("imagePath"),userController.createUser)
+    //@api/users
+    .post(upload.single("imagePath"), userController.createUser)
+    //@api/users?id=<user_id>
     .put(userController.editUser)
     .delete(userController.deleteUser)
 
-//Admin route for single get, put, delete user.
-/* router
-    .route("/profile/:userId")
-    .get(getSingle)
-    .delete(deleteUser);
-//Login route for all user */
-router.post("/login", userController.loginUser);
+router
+    .route("/login")
+    //@api/users/login
+    .post(accountValidation.isLogout,userController.loginUser)
 
-/* //General user route for only get their profile and update their profile.
+router
+    .route("/my-profile")
+    //@api/users/my-profile
+    .get(userController.ownProfile)
+
 router
     .route("/profile")
-    .get(getUserProfile)
-    .put(updateUserProfile); */
+    //@api/users/profile?id=<user_id>
+    .get(userController.otherProfile)
 
 module.exports = router;

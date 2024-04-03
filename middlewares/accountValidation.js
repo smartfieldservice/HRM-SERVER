@@ -1,8 +1,9 @@
 //@internal module
+const asyncHandler = require("express-async-handler")
 const { verifyAuthToken } = require("../utils/common");
 
 //@check is that requested account is logged in or not
-const isLogin  = async(req, res, next) => {
+const isLogin  = asyncHandler(async(req, res, next) => {
     
     try {
 
@@ -32,7 +33,32 @@ const isLogin  = async(req, res, next) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-}
+});
+
+const isLogout = asyncHandler(async(req, res, next ) => {
+
+    try {
+        
+        let authToken = req.get('Authorization');
+
+        if(!authToken){
+            next();
+        }else{
+            
+            authToken = authToken.split(' ')[1];
+            authToken = verifyAuthToken(authToken);
+
+            if(!authToken){
+                next();
+            }else{
+                res.status(400).json({ message: "You are already logged in !" });
+            }
+        }
+
+    } catch (error) {
+        next();
+    }
+});
 
 //@To check the account role
 const requiredRole = function(roleArray){
@@ -56,5 +82,6 @@ const requiredRole = function(roleArray){
 
 //@exports
 module.exports = {  isLogin,
+                    isLogout,
                     requiredRole
                 }

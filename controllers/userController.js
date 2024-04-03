@@ -1,15 +1,41 @@
+//@external module
 const asyncHandler = require("express-async-handler");
 const faker = require("faker");
-const { clearkey } = require("../utils/cache");
-const fs = require('fs');
-const util = require('util');
-const unlinkfile = util.promisify(fs.unlink);
-const path = require('path');
-const { uploadFile } = require('../s3');
-const User = require("../models/ User");
-const { pagination, generateAuthToken } = require("../utils/common");
 const { isValidObjectId } = require("mongoose");
 
+//@internal module
+const { User } = require("../models/modelExporter");
+const { pagination, 
+        generateAuthToken } = require("../utils/common");
+
+//@desc Authorize user & get token during login
+//@route POST /api/users/login
+//@access Public
+const loginUser = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (user && (await user.matchPassword(password))){
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                token: generateAuthToken(user._id,user.role),
+            });
+        } else {
+            res.status(401).json({ message:"Invalid email or password"});
+        }
+
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+
+});
 
 //@http://localhost:8000/api/users
 //@ACCESS Private/Admin
@@ -47,10 +73,6 @@ const createUser = asyncHandler(async (req, res) => {
         }
         else{
 
-            const file = req.file;
-            const result = await uploadFile(file);
-            await unlinkfile(file.path);
-                
             user = new User({
                 name,
                 email,
@@ -65,7 +87,7 @@ const createUser = asyncHandler(async (req, res) => {
                 country,
                 password,
                 role,
-                imagePath : result.Location
+                imagePath : req.file.location
             });
 
             await user.save();
@@ -133,29 +155,44 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 });
 
-//@desc Authorize user & get token during login
-//@route POST /api/users/login
-//@access Public
-const loginUser = asyncHandler(async (req, res) => {
+//@desc get own profile
+//@http://localhost:8000/api/users/my-profile
+//@access Private/Admin
+const ownProfile = asyncHandler(async(req, res) => {
 
     try {
+        
+        const user = await User.findById({ _id : req.account.id });
 
-        const { email, password } = req.body;
+        res.status(200).json({ message : "Here is your information" , data : user })
 
-        const user = await User.findOne({ email });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 
-        if (user && (await user.matchPassword(password))){
-            res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                token: generateAuthToken(user._id,user.role),
-            });
-        } else {
-            res.status(401).json({ message:"Invalid email or password"});
+});
+
+//@desc get other profile
+//@http://localhost:8000/api/users/profile?id=<user_id>
+//@access Private/Admin
+const otherProfile = asyncHandler(async(req, res) => {
+
+    try {
+        
+        if(!isValidObjectId( req.query.id )){
+
+            res.status(409).json({ message : "Invalid object Id" });
+
+        }else{
+
+            const user = await User.findById({ _id : req.query.id });
+
+            if(!user){
+                res.status(404).json({ message: "Not found" });
+            }else{
+                res.status(404).json({ message: "User found", data : user });
+            }
         }
-
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -185,65 +222,11 @@ const generateUsers = asyncHandler(async (req, res) => {
     }
 });
 
-
-//@desc Get user profile
-//@route GET /api/users/profile
-//@access Private
-const getUserProfile = asyncHandler(async (req, res) => {
-
-    const user = await User.findById(req.user._id).select("-password");
-
-    if (user) {
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-        });
-    } else {
-        res.status(404);
-        throw new Error("User not found");
-    }
-});
-
-//@desc   GET All Users
-//@route  GET /api/users
-//@access Private/Admin
-const getUsers = asyncHandler(async (req, res) => {
-    try{
-        
-        const users = await User.find({}).select("-password").sort({_id: -1 }); //newest first
-
-        res.json({ users });
-    }catch (error) {
-        res.json({ message: error });
-    }
-});
-
-//@desc get single user
-//@route GET /api/users/:id
-//@access Private/Admin
-const getSingle = asyncHandler(async (req, res) => {
-    try {
-        const user = await User.findById(req.params.userId).select("-password");
-        if (user == null) {
-            res.json({ message: "User not found" });
-        }else {
-            res.json(user);
-        }
-    }catch (error) {
-        res.json({ message: error });
-    }
-});
-
-
-
-module.exports = {  allUsers,
+module.exports = {  loginUser,
+                    allUsers,
                     createUser,
                     editUser,
                     deleteUser,
-                    getUserProfile,
-                    getSingle,
-                    loginUser,
-                    getUsers
+                    ownProfile,
+                    otherProfile
                 }
