@@ -6,7 +6,8 @@ const { isValidObjectId } = require("mongoose");
 //@internal module
 const { User } = require("../models/modelExporter");
 const { pagination, 
-        generateAuthToken } = require("../utils/common");
+        generateAuthToken, 
+        generateSlug} = require("../utils/common");
 
 //@desc Authorize user & get token during login
 //@route POST /api/users/login
@@ -25,7 +26,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: generateAuthToken(user._id,user.role),
+                token: generateAuthToken(user._id,user.role,generateSlug(user.concern)),
             });
         } else {
             res.status(401).json({ message:"Invalid email or password"});

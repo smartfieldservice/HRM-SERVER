@@ -3,7 +3,8 @@ const asyncHandler = require('express-async-handler');
 const { isValidObjectId } = require('mongoose');
 
 //@internal module
-const { Department } = require('../models/modelExporter');
+const { Department, 
+        Concern } = require('../models/modelExporter');
 const { escapeString, 
         generateSlug, 
         pagination } = require('../utils/common');
@@ -58,16 +59,25 @@ const concernWiseDepartment = asyncHandler(async(req, res) => {
 });
 
 // @desc all Depratment
-// @access super HR
-
+// @access hr/branch-hr
 const allDepartment = asyncHandler(async(req, res) => {
     
-    try{
+    try{   
+
+        const concern = await Concern.findOne({ slug : req.account.concern }).select("_id");
 
         const { page, limit, sort} = req.query;
 
-        let departments = Department.find({});
+        let departments;
 
+        if(!concern){
+            //@hr
+            departments = Department.find({ });
+        }else{
+            //@branch-hr
+            departments = Department.find({ concernId : concern });
+        }
+        
         let sortBy = "-createdAt";
         if(sort){
             sortBy = sort.replace(","," ");
@@ -186,7 +196,6 @@ const deleteDepartment = asyncHandler(async (req, res) => {
     }
 
 });
-
 
 module.exports = {  searchDeparment, 
                     concernWiseDepartment,

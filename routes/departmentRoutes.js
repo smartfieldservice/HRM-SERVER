@@ -18,5 +18,4 @@ router
     .put(departmentController.editDepartment)
     .delete(departmentController.deleteDepartment)
     
-
 module.exports = router;

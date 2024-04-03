@@ -5,13 +5,13 @@ const multer = require('multer');
 
 //@internal module
 const { userController } = require("../controllers/controllerExporter");
-const { s3Handler, accountValidation } = require("../middlewares/middlwareExporter");
+const { s3Handler, 
+        accountValidation } = require("../middlewares/middlwareExporter");
 
 const upload = multer({
     storage : s3Handler.storageConfig
 });
 
-//@Admin only create user and get All User.
 router
     .route("/")
     //@api/users?page=&limit=&sort=

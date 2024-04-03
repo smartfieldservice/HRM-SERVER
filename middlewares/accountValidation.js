@@ -24,14 +24,14 @@ const isLogin  = asyncHandler(async(req, res, next) => {
                 next();
             }
             else {
-                res.status(404).json({ message: "Invalid user" });
+                return res.status(404).json({ message: "Invalid user" });
             }
         }else{
-            res.status(404).json({ message: "Invalid Token" });
+            return res.status(404).json({ message: "Invalid Token" });
         }
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 });
 
@@ -51,7 +51,7 @@ const isLogout = asyncHandler(async(req, res, next ) => {
             if(!authToken){
                 next();
             }else{
-                res.status(400).json({ message: "You are already logged in !" });
+                return res.status(400).json({ message: "You are already logged in !" });
             }
         }
 
@@ -71,7 +71,7 @@ const requiredRole = function(roleArray){
             if(req.account && roleArray.includes(req.account.role)){
                 next();
             }else{
-                throw responseHandler.newError(401);
+                return res.status(401).json({message : `Invalid permission for ${req.account.role} !`});
             }
         }
         

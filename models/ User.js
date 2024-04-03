@@ -56,11 +56,13 @@ const userSchema = new mongoose.Schema(
         },
         concern : {
             type : String,
-            ref : "concern"
+            ref : "concern",
+            default : ""
         },
         department : {
             type : String,
-            ref : "department"
+            ref : "department",
+            default : ""
         },
         role: {
             type: String,
