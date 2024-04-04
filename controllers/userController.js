@@ -11,7 +11,7 @@ const { pagination,
 
 //@desc Authorize user & get token during login
 //@route POST /api/users/login
-//@access Public
+//@access hr/branch-hr
 const loginUser = asyncHandler(async (req, res) => {
 
     try {
@@ -39,7 +39,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //@http://localhost:8000/api/users
-//@ACCESS Private/Admin
+//@ACCESS hr
 const allUsers = asyncHandler(async(req, res) => {
 
     try {
@@ -60,7 +60,7 @@ const allUsers = asyncHandler(async(req, res) => {
 
 //@desc Create New User
 //@http://localhost:8000/api/users
-//@ACCESS Private/Admin
+//@ACCESS hr
 const createUser = asyncHandler(async (req, res) => {
 
     try {
@@ -105,7 +105,7 @@ const createUser = asyncHandler(async (req, res) => {
 
 //@desc Update user profile
 //@http://localhost:8000/api/users?id=
-//@access Private
+//@access hr/branch-hr
 const editUser = asyncHandler(async (req, res) => {
 
     try {
@@ -120,7 +120,20 @@ const editUser = asyncHandler(async (req, res) => {
 
             if(user){
                 
+                const { presentaddress, permanentaddress, city, country } = req.body;
 
+                await User.findByIdAndUpdate({
+                        _id : req.query.id
+                    },{
+                        presentaddress,
+                        permanentaddress,
+                        city,
+                        country
+                    },{ 
+                        new : true
+                });
+                
+                res.status(200).json({message : "Edited Successfully !"});
                 
             }else{
                 res.status(404).json({ message: "Not found" });
@@ -133,7 +146,7 @@ const editUser = asyncHandler(async (req, res) => {
 
 //@desc Delete single user
 //@http://localhost:8000/api/users?id=
-//@access Private/Admin
+//@access hr
 const deleteUser = asyncHandler(async (req, res) => {
 
     try {
@@ -158,7 +171,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 //@desc get own profile
 //@http://localhost:8000/api/users/my-profile
-//@access Private/Admin
+//@access hr/branch-hr
 const ownProfile = asyncHandler(async(req, res) => {
 
     try {
@@ -175,7 +188,7 @@ const ownProfile = asyncHandler(async(req, res) => {
 
 //@desc get other profile
 //@http://localhost:8000/api/users/profile?id=<user_id>
-//@access Private/Admin
+//@access hr
 const otherProfile = asyncHandler(async(req, res) => {
 
     try {

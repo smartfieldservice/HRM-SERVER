@@ -13,7 +13,7 @@ const { escapeString,
 
 // @desc Post Employee
 // @route Post /api/department
-// @access Private
+// @access hr/branch-hr
 
 const searchDeparment = async(req, res) => {
     
@@ -64,19 +64,19 @@ const allDepartment = asyncHandler(async(req, res) => {
     
     try{   
 
-        const concern = undefined; 
+        let concernId = undefined; 
         
-        //@after giving the role then use it as concern
-        //await Concern.findOne({ slug : req.account.concern }).select("_id");
+        //@after giving the role then use it as concernId
+        //concernId = await Concern.findOne({ slug : req.account.concern }).select("_id");
 
         let departments;
 
-        if(!concern){
+        if(!concernId){
             //@hr
             departments = Department.find({ });
         }else{
             //@branch-hr
-            departments = Department.find({ concernId : concern });
+            departments = Department.find({ concernId });
         }
         
         departments = departments.populate({ path : 'concernId', select : ['name']});
@@ -98,7 +98,7 @@ const allDepartment = asyncHandler(async(req, res) => {
 });
 
 // @add new Depratment
-// @access super HR
+// @access hr/branch-hr
 const  createDepartment = asyncHandler(async (req, res) => {
 
     try {
@@ -132,7 +132,7 @@ const  createDepartment = asyncHandler(async (req, res) => {
 });
 
 // @edit Depratment
-// @access Super HR
+// @access hr/branch-hr
 const editDepartment = async(req, res) => {
     
     try {
@@ -176,7 +176,7 @@ const editDepartment = async(req, res) => {
 }
 
 // @desc delete Depratment
-// @access Private
+// @access hr/branch-hr
 const deleteDepartment = asyncHandler(async (req, res) => {
 
     try {
