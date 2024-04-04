@@ -9,7 +9,7 @@ const documentSchema = mongoose.Schema({
             unique : true,
             required : true
         },
-        fileName : {
+        filesName : {
             type : Array,
             required : true
         },

@@ -1,9 +1,9 @@
-const userRoute = require("../routes/userRoutes");
+const userRoute = require("./userRoute");
 const concernRoute = require("../routes/concernRoute");
-const departmentRoute = require("../routes/departmentRoutes");
+const departmentRoute = require("../routes/departmentRoute");
 const leaveRoute = require("../routes/leaveRoutes");
 const expenseRoute = require("../routes/expenseRoutes");
-const documentRoute = require("../routes/departmentRoutes");
+const documentRoute = require("../routes/documentRoute");
 
 //@exports
 module.exports = {  userRoute,

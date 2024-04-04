@@ -4,7 +4,7 @@ const { unlinkFileFromLocal,
         filesArray, 
         pagination, 
         escapeString,
-        generateSlug} = require("../utils/common");
+        generateSlug } = require("../utils/common");
 
 //@show all document
 //@http://localhost:8000/api/document/all
@@ -51,31 +51,32 @@ const searchDocument = async( req, res) => {
 
 //@add a new document
 //@http://localhost:8000/api/document/
-//@private route(admin)
-const addDocument = async( req, res) => {
+//@private hr/branch-hr
+const createDocument = async( req, res) => {
     
-    const allFiles = filesArray(req.files);
-
     try {
 
+        const { title, description, owner }= req.body;
+
+        //@create an array of file locations
+        const allFiles = req.files.map((file) => {
+            return file.location;
+        })
+
         const newDocument = new Document({
-            title : req.body.title,
-            fileName : allFiles,
-            description : req.body.description,
-            owner : req.body.owner,
-            slug : generateSlug(req.body.title)
+            title ,
+            filesName : allFiles,
+            description ,
+            owner ,
+            slug : generateSlug(title)
         });
 
         await newDocument.save();
 
-        res.status(201).json({data : newDocument , message : "New document added successfully !"});
+        res.status(200).json({ message : "New document added successfully !", data : newDocument });
         
     } catch (error) {
-        if(error.code === 11000){
-            //duplicate title so delete the uploaded files
-            await unlinkFileFromLocal(allFiles,"Document");
-        }
-        res.status(400).json(error.message);
+        res.status(400).json({ message: error.message });
     }
 }
 
@@ -171,7 +172,7 @@ const singleDocumentView = async(req, res) => {
 //exports
 module.exports = {  searchDocument,
                     allDocument,
-                    addDocument,
+                    createDocument,
                     deleteDocument,
                     editDocument,
                     singleDocumentView
