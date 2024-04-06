@@ -1,4 +1,4 @@
-This is the full Rest-API project for IDOL MART created with express & mongodb.
+This is the full Rest-API project for HR Management created with express & mongodb.
 
 # Getting Started
 To run this project on your local machine after pull/clone operation, you can run this command for install all dependencies...
