@@ -9,4 +9,4 @@ then run the development server
 
     npm start
 
-Hit on http://localhost:4000 to see the result. All API & documentation of the API's are posted on postman.
+Hit on http://localhost:8000 to see the result. All API & documentation of the API's are posted on postman.
