@@ -13,6 +13,7 @@ const upload = multer({
 
 router
     .route("/")
+    .get(documentController.allDocument)
     .post(upload.array('filesName', 5), documentController.createDocument)
 
 

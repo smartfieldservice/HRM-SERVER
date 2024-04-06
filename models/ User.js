@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { mongoose, Schema } = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
@@ -54,15 +54,15 @@ const userSchema = new mongoose.Schema(
             required: true,
             default : "12345"
         },
-        concern : {
-            type : String,
+        concernId : {
+            type : Schema.ObjectId,
             ref : "concern",
-            default : ""
+            default : null
         },
-        department : {
-            type : String,
+        departmentId : {
+            type : Schema.ObjectId,
             ref : "department",
-            default : ""
+            default : null
         },
         role: {
             type: String,

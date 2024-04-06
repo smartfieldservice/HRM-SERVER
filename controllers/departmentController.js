@@ -9,12 +9,9 @@ const { escapeString,
         generateSlug, 
         pagination } = require('../utils/common');
 
-
-
 // @desc Post Employee
 // @route Post /api/department
 // @access hr/branch-hr
-
 const searchDeparment = async(req, res) => {
     
     try {
@@ -35,7 +32,7 @@ const searchDeparment = async(req, res) => {
 }
 
 //@http://localhost:8000/api/department/concern?id=<concern_id>
-//@access Private
+//@access hr/branch-hr
 const concernWiseDepartment = asyncHandler(async(req, res) => {
 
     try {
@@ -67,7 +64,7 @@ const allDepartment = asyncHandler(async(req, res) => {
         let concernId = undefined; 
         
         //@after giving the role then use it as concernId
-        //concernId = await Concern.findOne({ slug : req.account.concern }).select("_id");
+        //concernId = req.account.concernId;
 
         let departments;
 

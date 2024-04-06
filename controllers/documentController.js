@@ -8,16 +8,39 @@ const { unlinkFileFromLocal,
 
 //@show all document
 //@http://localhost:8000/api/document/all
-//@private route(admin)
+//@access hr/branch-hr
 const allDocument = async(req, res) => {
     
     try {
 
-        let allDocuments = Document.find({});
-
-        allDocuments = await pagination(req.query.page, req.query.limit, allDocuments);
+        let concernId = undefined;
         
-        res.status(201).json({message : `${allDocuments.length} document's found !`,allDocuments});
+        //@after giving the role then use it as concernId
+        //concernId = req.account.concernId;
+
+        let documents;
+
+        if(!concernId){
+            //@hr
+            documents = Document.find({ }); 
+        }else{
+            //@branch-hr
+            documents = Document.find({ concernId });
+        }
+
+        documents = documents.populate({path:'concernId departmentId' , select:'concern department'});
+
+        let sortBy = "-createdAt";
+        if(req.query.sort){
+            sortBy = req.query.sort.replace(","," ");
+        }
+
+        documents = documents.sort(sortBy);
+
+
+        documents = await pagination(req.query.page, req.query.limit, documents);
+        
+        res.status(201).json({message : `${documents.length} document's found !`,documents });
     
     } catch (error) {
         res.status(400).json(error.message);
@@ -26,7 +49,7 @@ const allDocument = async(req, res) => {
 
 //@search a document using params
 //@http://localhost:8000/api/document/search/:doc
-//@private route(admin)
+//@access hr/branch-hr
 const searchDocument = async( req, res) => {
     
     try {
@@ -51,12 +74,12 @@ const searchDocument = async( req, res) => {
 
 //@add a new document
 //@http://localhost:8000/api/document/
-//@private hr/branch-hr
+//@access hr/branch-hr
 const createDocument = async( req, res) => {
     
     try {
 
-        const { title, description, owner }= req.body;
+        const { title, description, concernId, departmentId }= req.body;
 
         //@create an array of file locations
         const allFiles = req.files.map((file) => {
@@ -67,7 +90,8 @@ const createDocument = async( req, res) => {
             title ,
             filesName : allFiles,
             description ,
-            owner ,
+            concernId ,
+            departmentId ,
             slug : generateSlug(title)
         });
 

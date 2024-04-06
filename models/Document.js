@@ -1,5 +1,5 @@
 //@external module
-const mongoose = require("mongoose");
+const { mongoose, Schema } = require("mongoose");
 
 //@create schema
 const documentSchema = mongoose.Schema({
@@ -17,9 +17,13 @@ const documentSchema = mongoose.Schema({
             type : String,
             required : true
         },
-        owner : {
-            type : String,
-            required : true
+        concernId : {
+            type : Schema.ObjectId,
+            ref : "concern"
+        },
+        departmentId : {
+            type : Schema.ObjectId,
+            ref : "department"
         },
         slug : {
             type : String,
