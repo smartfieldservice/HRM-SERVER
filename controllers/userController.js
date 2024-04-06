@@ -6,8 +6,7 @@ const { isValidObjectId } = require("mongoose");
 //@internal module
 const { User } = require("../models/modelExporter");
 const { pagination, 
-        generateAuthToken, 
-        generateSlug } = require("../utils/common");
+        generateAuthToken } = require("../utils/common");
 
 //@desc Authorize user & get token during login
 //@route POST /api/users/login
@@ -65,7 +64,8 @@ const createUser = asyncHandler(async (req, res) => {
 
     try {
 
-        const { name, email, mobile, emargencyMobile, department, employeeID, designation, presentaddress, permanentaddress, city, country, password, role } = req.body;
+        const { name, email, mobile, emargencyMobile, employeeId, designation, presentaddress, 
+            permanentaddress, city, country, password, role, concernId, departmentId } = req.body;
 
         let user = await User.findOne({ email });
 
@@ -79,8 +79,7 @@ const createUser = asyncHandler(async (req, res) => {
                 email,
                 mobile,
                 emargencyMobile,
-                department,
-                employeeID,
+                employeeId,
                 designation,
                 presentaddress,
                 permanentaddress,
@@ -88,6 +87,8 @@ const createUser = asyncHandler(async (req, res) => {
                 country,
                 password,
                 role,
+                concernId,
+                departmentId,
                 imagePath : req.file.location
             });
 
