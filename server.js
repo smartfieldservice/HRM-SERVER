@@ -28,6 +28,9 @@ if(process.env.NODE_ENV === "development"){
 }
 
 app
+  .use("/", (req, res) =>{
+    res.status(200).send("Welcome to HR-Management :) ")
+  })
   .use("/api/users", userRoute)
   .use("/api/concern", concernRoute)
   .use("/api/department", departmentRoute)
