@@ -1,4 +1,5 @@
 //@internal module
+const { isValidObjectId } = require("mongoose");
 const Document = require("../models/Document");
 const { unlinkFileFromLocal, 
         filesArray, 
@@ -153,19 +154,22 @@ const editDocument = async( req, res) => {
 const deleteDocument = async( req, res) => {
     
     try {
-        
-        const documentData = await Document.findOne({ _id : req.query.id });
 
-        if(documentData){
-
-            await Document.findByIdAndDelete({ _id : req.query.id });
-
-            res.status(201).json({message : "Document deleted successfully !"});
-
-        }else{
-            throw new Error("Document not found !");
+        if(!isValidObjectId(req.query.id)){
+            res.status(409).json({ message : "Invalid document Id"});
         }
+        else{
 
+            const documentData = await Document.findById({ _id : req.query.id });
+
+            if(!documentData){
+                res.status(404).json({ message : "Not found" });
+            }else{
+
+                await Document.findByIdAndDelete({ _id : req.query.id });
+                res.status(201).json({message : "Document deleted successfully !"});
+            }
+        }
     } catch (error) {
         res.status(400).json(error.message);
     }
