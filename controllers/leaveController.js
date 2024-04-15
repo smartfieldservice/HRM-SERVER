@@ -4,7 +4,8 @@ const asyncHandler = require('express-async-handler');
 //@internal module
 const Leave = require('../models/Leave');
 const { escapeString, 
-        generateSlug } = require('../utils/common');
+        generateSlug, 
+        pagination} = require('../utils/common');
 
 const searchLeave = async(req, res) => {
     try {
@@ -14,7 +15,7 @@ const searchLeave = async(req, res) => {
         if(req.params.str !== ""){
             
             const expenseData = await Leave.find({
-                $or : [{employeename : searchQuery},{leavetype : searchQuery}]
+                $or : [{ employeename : searchQuery},{leavetype : searchQuery}]
             });
 
             res.status(201).json({message : `${expenseData.length} expense found !`,expenseData});
@@ -61,13 +62,37 @@ const createLeave = asyncHandler(async (req, res) => {
     }
 });
 
-const AllleaveData = asyncHandler(async(req, res) => {
+const allLeave = asyncHandler(async(req, res) => {
+    
     try{
-        const leaveallData = await Leave.find();
-        res.status(200);
-        res.json(leaveallData);
-    }catch(err){
-        res.json({ message: err});
+
+        let concernId = undefined;
+
+         //@after giving the role then use it as concernId
+        //concernId = req.account.concernId;
+
+        let leaves;
+
+        if(!concernId){
+            //@hr
+            leaves = Leave.find({ });
+        }else{
+            //@brach-hr
+            leaves = Leave.find({ concernId });
+        }
+
+        let sortBy = "-createdAt";
+        if(req.query.sort){
+            sortBy = req.query.sort.replace(","," ");
+        }
+
+        leaves = leaves.sort(sortBy);
+        leaves = await pagination(req.query.page, req.query.limit, leaves);
+
+        res.status(200).json({ message : `${leaves.length} leaves found`, data : leaves });
+    
+    }catch(error){
+       res.status(400).json({ message : error.message });
     }
 });
 
@@ -114,7 +139,7 @@ const deleteLeave = asyncHandler(async (req, res) => {
 });
 
 module.exports = {  createLeave, 
-                    AllleaveData, 
+                    allLeave, 
                     deleteLeave, 
                     searchLeave, 
                     editLeave };
