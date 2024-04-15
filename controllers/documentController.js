@@ -3,9 +3,7 @@ const { isValidObjectId } = require("mongoose");
 
 //@internal module
 const Document = require("../models/Document");
-const { unlinkFileFromLocal, 
-        filesArray, 
-        pagination, 
+const { pagination, 
         escapeString,
         generateSlug } = require("../utils/common");
 

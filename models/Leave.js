@@ -1,3 +1,4 @@
+const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const leaveSchema = new mongoose.Schema(
@@ -26,6 +27,9 @@ const leaveSchema = new mongoose.Schema(
         },
         description: {
             type: String
+        },
+        slug : {
+            type : String
         }
     },
     {

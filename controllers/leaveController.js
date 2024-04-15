@@ -1,6 +1,10 @@
+//@external module
 const asyncHandler = require('express-async-handler');
+
+//@internal module
 const Leave = require('../models/Leave');
-const { escapeString } = require('../utils/common');
+const { escapeString, 
+        generateSlug } = require('../utils/common');
 
 const searchLeave = async(req, res) => {
     try {
@@ -22,26 +26,38 @@ const searchLeave = async(req, res) => {
     }
 }
 
-// @desc Post Leave
+// @desc create Leave
 // @route Post /api/leave
-// @access Private
-const PostLeave = asyncHandler(async (req, res) => {
-    const leaveData = await new Leave({
-        employeename: req.body.employeename,
-        duration: req.body.duration,
-        leavetype: req.body.leavetype,
-        totaldays: req.body.totaldays,
-        startdate: req.body.startdate,
-        enddate: req.body.enddate,
-        description: req.body.description,
-        status: req.body.status
-    });
-    try{
-        const LeaveForm = await leaveData.save();
-        res.status(201);
-        res.json(LeaveForm);
-    }catch(err){
-        res.json({ message: err });
+// @access hr/branch-hr
+const createLeave = asyncHandler(async (req, res) => {
+    
+    try {
+        
+        const { employeename, duration, leavetype, totaldays, startdate, enddate, description, status } = req.body;
+        const slug = generateSlug(description);
+        let leave = await Leave.findOne({ slug });
+
+        if(leave){
+            res.status().json({ message : "This leave already added !"});
+        }else{
+
+            leave = new Leave({
+                employeename,
+                duration,
+                leavetype,
+                totaldays,
+                startdate,
+                enddate,
+                description,
+                status,
+                slug
+            });
+
+            await leave.save();
+            res.status(200).json({ message : "Added successfully", leave });
+        }   
+    } catch (error) {
+        res.status(400).json({ message : error.message });
     }
 });
 
@@ -97,4 +113,8 @@ const deleteLeave = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { PostLeave, AllleaveData, deleteLeave, searchLeave, editLeave };
+module.exports = {  createLeave, 
+                    AllleaveData, 
+                    deleteLeave, 
+                    searchLeave, 
+                    editLeave };
