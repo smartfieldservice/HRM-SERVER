@@ -1,5 +1,7 @@
-//@internal module
+//@external module
 const { isValidObjectId } = require("mongoose");
+
+//@internal module
 const Document = require("../models/Document");
 const { unlinkFileFromLocal, 
         filesArray, 
@@ -57,12 +59,12 @@ const searchDocument = async( req, res) => {
         
         if(req.params.doc !== ""){
             
-            const searchQuery = new RegExp(escapeString(req.params.doc),"i");
+            const searchQuery = new RegExp( escapeString(req.params.doc),"i" );
 
             const documentData = await Document.find({
                 $or  : [
-                    {title : searchQuery},
-                    {description : searchQuery}
+                    { title : searchQuery},
+                    { description : searchQuery}
                 ]
             });
             
@@ -112,36 +114,29 @@ const editDocument = async( req, res) => {
     
     try {
 
-        const allFiles = filesArray(req.files);
-        
-        const documentData = await Document.findOne({ _id : req.query.id });
-
-        if(documentData){
-            
-            const filesDelete = unlinkFileFromLocal(documentData.fileName, "Document");
-
-            const updateDocument = Document.findByIdAndUpdate(
-                {   
-                    _id : req.query.id
-                },
-                {
-                    title : req.body.title,
-                    fileName : allFiles,
-                    description : req.body.description,
-                    slug : generateSlug(req.body.title)
-                },
-                { 
-                    new : true
-                }
-            );
-
-            await Promise.all([filesDelete, updateDocument]);
-
-            res.status(201).json({message : "Document edited successfully !"});
-
+        if(!isValidObjectId(req.query.id)){
+            res.status(409).json({ message : "Invalid document Id"});
+    
         }else{
-            await unlinkFileFromLocal(allFiles,"Document");
-            throw new Error("Document not found !");
+
+            const document = await Document.findById({ _id : req.query.id });
+            if(!document){
+                res.status(404).json({ message : "Not found" });
+            }else{
+
+                const { title, description } = req.body;
+                await Document.findByIdAndUpdate({
+                        _id : req.query.id
+                    },{
+                        title,
+                        description,
+                        slug : generateSlug(req.body.title)
+                    },{ 
+                        new : true
+                });
+
+                res.status(201).json({message : "Document edited successfully !"});
+            }
         }
     } catch (error) {
         res.status(400).json(error.message);
