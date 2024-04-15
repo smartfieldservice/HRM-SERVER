@@ -1,8 +1,12 @@
-const { string } = require("joi");
-const mongoose = require("mongoose");
+const { mongoose,Schema } = require("mongoose");
 
 const leaveSchema = new mongoose.Schema(
     {
+        concernId : {
+            type : Schema.ObjectId,
+            ref : "concern",
+            default : null
+        },
         employeename: {
             type: String,
             required: true
