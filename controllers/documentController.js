@@ -149,7 +149,7 @@ const editDocument = async( req, res) => {
 
 //@delete a document using id as query
 //@http://localhost:8000/api/document?id=
-//@private route(admin)
+//@access hr/branch-hr
 const deleteDocument = async( req, res) => {
     
     try {
@@ -157,8 +157,6 @@ const deleteDocument = async( req, res) => {
         const documentData = await Document.findOne({ _id : req.query.id });
 
         if(documentData){
-
-            await unlinkFileFromLocal(documentData.fileName,"Document");
 
             await Document.findByIdAndDelete({ _id : req.query.id });
 
@@ -175,7 +173,7 @@ const deleteDocument = async( req, res) => {
 
 //@for show a single document using slug as query
 //@http://localhost:8000/api/document/title?slug=
-//@private route(admin)
+//@access hr/branch-hr
 const singleDocumentView = async(req, res) => {
 
     try {

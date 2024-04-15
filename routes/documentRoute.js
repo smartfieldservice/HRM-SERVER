@@ -15,7 +15,7 @@ router
     .route("/")
     .get(documentController.allDocument)
     .post(upload.array('filesName', 5), documentController.createDocument)
-
+    .delete(documentController.deleteDocument)
 
 /* router.route("/all").get(allDocument);
 router.route("/search/:doc").get(searchDocument);
