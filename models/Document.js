@@ -19,11 +19,13 @@ const documentSchema = mongoose.Schema({
         },
         concernId : {
             type : Schema.ObjectId,
-            ref : "concern"
+            ref : "concern",
+            default : null
         },
         departmentId : {
             type : Schema.ObjectId,
-            ref : "department"
+            ref : "department",
+            default : null
         },
         slug : {
             type : String,

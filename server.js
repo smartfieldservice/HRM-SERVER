@@ -28,14 +28,11 @@ if(process.env.NODE_ENV === "development"){
 }
 
 app
-  .use("/", (req, res) =>{
-    res.status(200).send("Welcome to HR-Management :) ")
-  })
   .use("/api/users", userRoute)
   .use("/api/concern", concernRoute)
   .use("/api/department", departmentRoute)
+  .use("/api/document", documentRoute)
   .use("/api/leave", leaveRoute)
   .use("/api/expense", expenseRoute)
-  .use("/api/document", documentRoute)
-
+  
 app.listen(process.env.PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}!`));

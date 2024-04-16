@@ -82,24 +82,33 @@ const createDocument = async( req, res) => {
 
         const { title, description, concernId, departmentId }= req.body;
 
-        //@create an array of file locations
-        const allFiles = req.files.map((file) => {
-            return file.location;
-        })
+        const slug = generateSlug(title);
 
-        const newDocument = new Document({
-            title ,
-            filesName : allFiles,
-            description ,
-            concernId ,
-            departmentId ,
-            slug : generateSlug(title)
-        });
+        let document = await Document.findOne({ slug });
 
-        await newDocument.save();
+        if(document){
 
-        res.status(200).json({ message : "New document added successfully !", data : newDocument });
-        
+            res.status(409).json({ message : " Already exists !"});
+
+        }else{
+
+            //@create an array of file locations
+            const allFiles = req.files.map((file) => {
+                return file.location;
+            });
+
+            document = new Document({
+                title ,
+                filesName : allFiles,
+                description ,
+                concernId ,
+                departmentId ,
+                slug
+            });
+
+            await document.save();
+            res.status(200).json({ message : "New document added successfully !", data : document });
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -107,23 +116,24 @@ const createDocument = async( req, res) => {
 
 //@edit a document using id as query
 //@http://localhost:8000/api/document?id=
-//@private route(admin)
+//@access hr/branch-hr
 const editDocument = async( req, res) => {
     
     try {
 
         if(!isValidObjectId(req.query.id)){
             res.status(409).json({ message : "Invalid document Id"});
-    
         }else{
 
             const document = await Document.findById({ _id : req.query.id });
+            
             if(!document){
                 res.status(404).json({ message : "Not found" });
             }else{
 
                 const { title, description } = req.body;
-                await Document.findByIdAndUpdate({
+
+                await Document.findByIdAndUpdate({ 
                         _id : req.query.id
                     },{
                         title,
@@ -168,31 +178,10 @@ const deleteDocument = async( req, res) => {
     }
 }
 
-//@for show a single document using slug as query
-//@http://localhost:8000/api/document/title?slug=
-//@access hr/branch-hr
-const singleDocumentView = async(req, res) => {
-
-    try {
-        
-        const documentData = await Document.findOne({slug : req.query.slug});
-
-        if(documentData){
-            res.status(200).json({message : "Document found successfully !", documentData});
-        }else{
-            throw new Error("Document not found !");
-        }
-    } catch (error) {
-        res.status(400).json(error.message);
-    }
-
-}
-
 //exports
-module.exports = {  searchDocument,
-                    allDocument,
+module.exports = {  allDocument,
+                    searchDocument,
                     createDocument,
-                    deleteDocument,
                     editDocument,
-                    singleDocumentView
+                    deleteDocument
                 }
