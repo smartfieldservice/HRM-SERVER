@@ -7,8 +7,8 @@ const { leaveController } = require("../controllers/controllerExporter");
 
 router
     .route("/")
-    .get(leaveController.createLeave)
-    .post()
+    .get(leaveController.allLeave)
+    .post(leaveController.createLeave)
     .put()
     .delete()
 

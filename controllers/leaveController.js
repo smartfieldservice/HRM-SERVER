@@ -27,48 +27,16 @@ const searchLeave = asyncHandler(async(req, res) => {
     }
 });
 
-// @desc create Leave
-// @route Post /api/leave
+// @desc display Leave
+// @route Get /api/leave
 // @access hr/branch-hr
-const createLeave = asyncHandler(async (req, res) => {
-    
-    try {
-        
-        const { employeename, duration, leavetype, totaldays, startdate, enddate, description, status } = req.body;
-        const slug = generateSlug(description);
-        let leave = await Leave.findOne({ slug });
-
-        if(leave){
-            res.status().json({ message : "This leave already added !"});
-        }else{
-
-            leave = new Leave({
-                employeename,
-                duration,
-                leavetype,
-                totaldays,
-                startdate,
-                enddate,
-                description,
-                status,
-                slug
-            });
-
-            await leave.save();
-            res.status(200).json({ message : "Added successfully", leave });
-        }   
-    } catch (error) {
-        res.status(400).json({ message : error.message });
-    }
-});
-
 const allLeave = asyncHandler(async(req, res) => {
     
     try{
 
         let concernId = undefined;
 
-         //@after giving the role then use it as concernId
+        //@after giving the role then use it as concernId
         //concernId = req.account.concernId;
 
         let leaves;
@@ -93,6 +61,36 @@ const allLeave = asyncHandler(async(req, res) => {
     
     }catch(error){
        res.status(400).json({ message : error.message });
+    }
+});
+
+// @desc create Leave
+// @route Post /api/leave
+// @access hr/branch-hr
+const createLeave = asyncHandler(async (req, res) => {
+    
+    try {
+        
+        const { concernId, departmentId, employeeId, duration, 
+            leavetype, startdate, enddate, totaldays, description } = req.body;
+
+        const leave = new Leave({
+            concernId,
+            departmentId,
+            employeeId,
+            duration,
+            leavetype,
+            startdate,
+            enddate,
+            totaldays,
+            description
+        });
+
+        await leave.save();
+        res.status(200).json({ message : "Added successfully", data : leave }); 
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });
     }
 });
 

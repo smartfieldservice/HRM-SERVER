@@ -18,14 +18,11 @@ const leaveSchema = new mongoose.Schema(
             required: true 
         },
         duration: {
-            type: Number,
+            type: String,
         },
         leavetype: {
             type: String,
             required: true,
-        },
-        totaldays: {
-            type: Number
         },
         startdate: {
             type: String,
@@ -34,6 +31,9 @@ const leaveSchema = new mongoose.Schema(
         enddate: {
             type: String,
             required: true
+        },
+        totaldays: {
+            type: Number
         },
         description: {
             type: String
