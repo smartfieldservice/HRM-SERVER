@@ -4,7 +4,7 @@ const faker = require("faker");
 const { isValidObjectId } = require("mongoose");
 
 //@internal module
-const { User } = require("../models/modelExporter");
+const { User, Leave } = require("../models/modelExporter");
 const { pagination, 
         generateAuthToken } = require("../utils/common");
 
@@ -187,7 +187,7 @@ const ownProfile = asyncHandler(async(req, res) => {
 
 });
 
-//@desc get other profile
+//@desc get other profile & total leave
 //@http://localhost:8000/api/users/profile?id=<user_id>
 //@access hr
 const otherProfile = asyncHandler(async(req, res) => {
@@ -205,7 +205,11 @@ const otherProfile = asyncHandler(async(req, res) => {
             if(!user){
                 res.status(404).json({ message: "Not found" });
             }else{
-                res.status(404).json({ message: "User found", data : user });
+
+                //@for total leave of this employee
+                const totalLeave = await Leave.find({ employeeId : req.query.id });
+                
+                res.status(404).json({ message: "User found", data : user , leave : totalLeave });
             }
         }
     } catch (error) {
