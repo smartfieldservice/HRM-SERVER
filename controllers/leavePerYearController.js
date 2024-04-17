@@ -43,16 +43,25 @@ const createLeavePerYear = asyncHandler(async(req, res) => {
         
         const { year, casual, sick, other } = req.body;
 
-        const leavePerYear = new LeavePerYear({
-            year,
-            casual,
-            sick,
-            other
-        });
+        let leavePerYear = await LeavePerYear.findOne({ year });
 
-        await leavePerYear.save();
-        res.status(200).json({message : "Leave per year added successfully !", leavePerYear });
+        if(leavePerYear){
+            res.status(409).json({ message : "Already exist" });
+        }else{
 
+            leavePerYear = new LeavePerYear({
+                year,
+                casual,
+                sick,
+                other
+            });
+    
+            await leavePerYear.save();
+            res.status(200).json({message : "Leave per year added successfully !", leavePerYear });
+    
+        }
+
+        
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
