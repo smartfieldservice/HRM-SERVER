@@ -11,6 +11,7 @@ const { userRoute,
         concernRoute,
         departmentRoute,
         leaveRoute,
+        leavePerYearRoute,
         expenseRoute,
         documentRoute } = require("./routes/routeExporter");
 
@@ -33,6 +34,7 @@ app
   .use("/api/department", departmentRoute)
   .use("/api/document", documentRoute)
   .use("/api/leave", leaveRoute)
+  .use("/api/leave-per-year", leavePerYearRoute)
   .use("/api/expense", expenseRoute)
   
 app.listen(process.env.PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}!`));

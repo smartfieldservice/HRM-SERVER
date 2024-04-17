@@ -12,8 +12,8 @@ const upload = multer({
     storage : s3Handler.storageConfig
 });
 
-router
-    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr']));
+/* router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr'])); */
 router
     .route("/")
     .get(concernController.allConcern)

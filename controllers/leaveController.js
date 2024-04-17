@@ -2,12 +2,14 @@
 const asyncHandler = require('express-async-handler');
 
 //@internal module
-const Leave = require('../models/Leave');
+const { Leave } = require('../models/modelExporter');
 const { escapeString, 
         generateSlug, 
         pagination} = require('../utils/common');
 
-const searchLeave = async(req, res) => {
+
+
+const searchLeave = asyncHandler(async(req, res) => {
     try {
 
         const searchQuery = new RegExp(escapeString(req.params.str),"i");
@@ -25,7 +27,9 @@ const searchLeave = async(req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-}
+});
+
+
 
 // @desc create Leave
 // @route Post /api/leave
@@ -142,4 +146,5 @@ module.exports = {  createLeave,
                     allLeave, 
                     deleteLeave, 
                     searchLeave, 
-                    editLeave };
+                    editLeave
+                };

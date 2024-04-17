@@ -3,7 +3,11 @@ const express = require("express");
 const router = express.Router();
 
 //@internal module
-const { leaveController } = require("../controllers/controllerExporter");
+const { leaveController, leavePerYearController } = require("../controllers/controllerExporter");
+
+router
+    .route("/assign-leave")
+    .post(leavePerYearController.createLeavePerYear)
 
 router
     .route("/")
