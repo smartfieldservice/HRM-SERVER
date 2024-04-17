@@ -7,8 +7,6 @@ const { escapeString,
         generateSlug, 
         pagination} = require('../utils/common');
 
-
-
 const searchLeave = asyncHandler(async(req, res) => {
     try {
 
@@ -28,8 +26,6 @@ const searchLeave = asyncHandler(async(req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
-
-
 
 // @desc create Leave
 // @route Post /api/leave

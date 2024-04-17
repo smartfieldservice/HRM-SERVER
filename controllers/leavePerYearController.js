@@ -5,6 +5,20 @@ const { isValidObjectId } = require('mongoose');
 //@internal module
 const { LeavePerYear } = require('../models/modelExporter');
 
+
+const getLeavePerYear = asyncHandler(async(req, res) => {
+
+    try {
+
+        const leavePerYear = await LeavePerYear.find({ });
+        res.status(200).json({ message : `${leavePerYear.length} data found !`, leavePerYear })
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });
+    }
+
+});
+
 // @desc create Leave-per-year
 // @route Post /api/leave/assign-leave
 // @access hr
@@ -61,6 +75,7 @@ const deleteLeavePerYear = asyncHandler(async(req, res) => {
 });
 
 //@exports
-module.exports = {  createLeavePerYear,
+module.exports = {  getLeavePerYear,
+                    createLeavePerYear,
                     deleteLeavePerYear
                 }
