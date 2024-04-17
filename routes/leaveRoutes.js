@@ -9,8 +9,8 @@ router
     .route("/")
     .get(leaveController.allLeave)
     .post(leaveController.createLeave)
-    .put()
-    .delete()
+    .put(leaveController.editLeave)
+    .delete(leaveController.deleteLeave)
 
 /* 
 router.route("/:str").get(searchLeave);

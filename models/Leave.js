@@ -37,9 +37,6 @@ const leaveSchema = new mongoose.Schema(
         },
         description: {
             type: String
-        },
-        slug : {
-            type : String
         }
     },
     {

@@ -6,6 +6,7 @@ const { Leave } = require('../models/modelExporter');
 const { escapeString, 
         generateSlug, 
         pagination} = require('../utils/common');
+const { isValidObjectId } = require('mongoose');
 
 const searchLeave = asyncHandler(async(req, res) => {
     try {
@@ -94,46 +95,78 @@ const createLeave = asyncHandler(async (req, res) => {
     }
 });
 
-const editLeave = async(req, res) => {
-    try {
-        const leaveData = await Leave.findOne({_id : req.query.id});
 
-        if(leaveData){
-            const editLeave = await Leave.findByIdAndUpdate(
-                {
+// @desc edit Leave
+// @route Put /api/leave
+// @access hr/branch-hr
+const editLeave = asyncHandler(async(req, res) => {
+
+    try {
+
+        if(!isValidObjectId(req.query.id)){
+
+            res.status(409).json({ message : "Invalid leave Id" });
+        
+        }else{
+            let leave = await Leave.findOne({_id : req.query.id});
+
+            if(!leave){
+                res.status(404).json({ message : "Not found" });
+            }else{
+                const { duration, leavetype, startdate, enddate, totaldays, description } = req.body;
+                
+                await Leave.findByIdAndUpdate({
                     _id : req.query.id 
                 },{
-                    employeename: req.body.employeename,
-                    duration: req.body.duration,
-                    leavetype: req.body.leavetype,
-                    totaldays: req.body.totaldays,
-                    startdate: req.body.startdate,
-                    enddate: req.body.enddate,
-                    description: req.body.description,
-                    status: req.body.status
+                    duration,
+                    leavetype,
+                    startdate,
+                    enddate,
+                    totaldays,
+                    description
                 },{
                     new : true
                 });
-            
-                res.status(201).json({message : "Edited Successfully !", editLeave});
-            
-        }else{
-            throw new Error("Data not found !");
+                
+                res.status(200).json({ message : "Edited successfully" });
+            }
         }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-}
+});
 
+
+// @desc delete Leave
+// @route Delete /api/leave
+// @access hr/branch-hr
 const deleteLeave = asyncHandler(async (req, res) => {
-    const findleave = await Leave.findById(req.params.Id);
-    if(findleave){
-        await Leave.deleteOne({ _id: findleave._id });
-        res.json({ message: "Leave delete Successfully"});
-    }else{
-        res.status(404);
-        throw new Error("Leave not found");
+
+    try {
+        
+        if(!isValidObjectId(req.query.id)){
+
+            res.status(409).json({ message : "Invalid leave Id" });
+        
+        }
+        else{
+            
+            const leave = await Leave.findById({ _id : req.query.id });
+
+            if(!leave){
+                res.status(404).json({ message : "Not found" });
+            }
+            else{
+
+                await Leave.findByIdAndDelete({ _id : req.query.id });
+                res.status(200).json({ message : "Deleted successfully" });
+            }
+        }
+
+    } catch (error) {
+        res.status(400).status({ message : error.message });
     }
+
 });
 
 module.exports = {  createLeave, 
