@@ -15,7 +15,7 @@ const leaveSchema = new mongoose.Schema(
         employeeId: {
             type: String,
             ref : "user",
-            required: true
+            required: true 
         },
         duration: {
             type: String,
@@ -40,18 +40,6 @@ const leaveSchema = new mongoose.Schema(
         },
         slug : {
             type : String
-        },
-        casual : {
-            type : Number,
-            default : 0
-        },
-        sick : {
-            type : Number,
-            default : 0
-        },
-        other : {
-            type : Number,
-            default : 0
         }
     },
     {

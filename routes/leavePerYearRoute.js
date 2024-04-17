@@ -8,7 +8,7 @@ const { leavePerYearController } = require("../controllers/controllerExporter");
 router
     .route("/")
     .post(leavePerYearController.createLeavePerYear)
-    .put(leavePerYearController.editLeavePerYear)
+    .delete(leavePerYearController.deleteLeavePerYear)
 
 //@exports
 module.exports = router;

@@ -32,7 +32,7 @@ const createLeavePerYear = asyncHandler(async(req, res) => {
 // @desc update Leave-per-year
 // @route Put /api/leave/assign-leave
 // @access hr
-const editLeavePerYear = asyncHandler(async(req, res) => {
+const deleteLeavePerYear = asyncHandler(async(req, res) => {
 
     try {
 
@@ -50,20 +50,9 @@ const editLeavePerYear = asyncHandler(async(req, res) => {
             
             }else{
 
-                const { year, casual, sick, other } = req.body;
+                await LeavePerYear.findByIdAndDelete({ _id : req.query.id });
 
-                await LeavePerYear.findByIdAndUpdate({
-                    _id : req.query.id
-                },{
-                    year,
-                    casual,
-                    sick,
-                    other
-                },{
-                    new : true
-                });
-
-                res.status(200).json({ message : "Edited successfully" });
+                res.status(200).json({ message : "Deleted successfully" });
             }
         }
     } catch (error) {
@@ -73,5 +62,5 @@ const editLeavePerYear = asyncHandler(async(req, res) => {
 
 //@exports
 module.exports = {  createLeavePerYear,
-                    editLeavePerYear
+                    deleteLeavePerYear
                 }
