@@ -3,35 +3,12 @@ const asyncHandler = require('express-async-handler');
 const { isValidObjectId } = require('mongoose');
 
 //@internal module
-const { Department, 
-        Concern } = require('../models/modelExporter');
-const { escapeString, 
-        generateSlug, 
+const { Department } = require('../models/modelExporter');
+const { generateSlug, 
         pagination } = require('../utils/common');
 
-// @desc Post Employee
-// @route Post /api/department
-// @access hr/branch-hr
-const searchDeparment = async(req, res) => {
-    
-    try {
-        
-        const searchQuery = new RegExp(escapeString(req.params.dep));
-
-        if(req.params.dep !== ""){
-            const department = await Department.find({
-                $or : [{departmentName : searchQuery }]
-            });
-
-            res.status(201).json({message : `${department} department found !`,department});
-        }
-
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-}
-
-//@http://localhost:8000/api/department/concern?id=<concern_id>
+//@desc get concern wise department
+//@route Get /api/department/concern?id=<concern_id>
 //@access hr/branch-hr
 const concernWiseDepartment = asyncHandler(async(req, res) => {
 
@@ -55,8 +32,9 @@ const concernWiseDepartment = asyncHandler(async(req, res) => {
 
 });
 
-// @desc all Depratment
-// @access hr/branch-hr
+//@desc get all department
+//@route Get /api/department?page=&limit=&sort=
+//@access hr/branch-hr
 const allDepartment = asyncHandler(async(req, res) => {
     
     try{   
@@ -94,8 +72,9 @@ const allDepartment = asyncHandler(async(req, res) => {
     }
 });
 
-// @add new Depratment
-// @access hr/branch-hr
+//@desc create new Depratment
+//@route Post /api/department
+//@access hr/branch-hr
 const  createDepartment = asyncHandler(async (req, res) => {
 
     try {
@@ -126,8 +105,9 @@ const  createDepartment = asyncHandler(async (req, res) => {
     }
 });
 
-// @edit Depratment
-// @access hr/branch-hr
+//@desc edit Depratment
+//@route Post /api/department?id=<department_id>
+//@access hr/branch-hr
 const editDepartment = async(req, res) => {
     
     try {
@@ -170,8 +150,9 @@ const editDepartment = async(req, res) => {
     }
 }
 
-// @desc delete Depratment
-// @access hr/branch-hr
+//@desc delete Depratment
+//@route Post /api/department?id=<department_id>
+//@access hr/branch-hr
 const deleteDepartment = asyncHandler(async (req, res) => {
 
     try {
@@ -197,8 +178,8 @@ const deleteDepartment = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = {  searchDeparment, 
-                    concernWiseDepartment,
+//@exports
+module.exports = {  concernWiseDepartment,
                     allDepartment,
                     createDepartment, 
                     editDepartment,

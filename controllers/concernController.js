@@ -143,6 +143,7 @@ const deleteConcern = asyncHandler(async(req, res) => {
 
 });
 
+//@exports
 module.exports = {  allConcern,
                     createConcern,
                     editConcern,
