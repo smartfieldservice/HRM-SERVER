@@ -27,9 +27,9 @@ const searchLeave = asyncHandler(async(req, res) => {
     }
 });
 
-// @desc display Leave
-// @route Get /api/leave
-// @access hr/branch-hr
+//@desc display all Leave
+//@route Get /api/leave?page=&limit=&sort=
+//@access hr/branch-hr
 const allLeave = asyncHandler(async(req, res) => {
     
     try{
@@ -67,9 +67,9 @@ const allLeave = asyncHandler(async(req, res) => {
     }
 });
 
-// @desc create Leave
-// @route Post /api/leave
-// @access hr/branch-hr
+//@desc create Leave
+//@route Post /api/leave
+//@access hr/branch-hr
 const createLeave = asyncHandler(async (req, res) => {
     
     try {
@@ -124,9 +124,9 @@ const createLeave = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc edit Leave
-// @route Put /api/leave
-// @access hr/branch-hr
+//@desc edit Leave
+//@route Put /api/leave?id=<leave_id>
+//@access hr/branch-hr
 const editLeave = asyncHandler(async(req, res) => {
 
     try {
@@ -164,9 +164,9 @@ const editLeave = asyncHandler(async(req, res) => {
     }
 });
 
-// @desc delete Leave
-// @route Delete /api/leave
-// @access hr/branch-hr
+//@desc delete Leave
+//@route Delete /api/leave?id=<leave_id>
+//@access hr/branch-hr
 const deleteLeave = asyncHandler(async (req, res) => {
 
     try {
@@ -196,6 +196,7 @@ const deleteLeave = asyncHandler(async (req, res) => {
 
 });
 
+//@exports
 module.exports = {  createLeave, 
                     allLeave, 
                     deleteLeave, 
