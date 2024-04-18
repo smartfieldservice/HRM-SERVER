@@ -4,12 +4,14 @@ const faker = require("faker");
 const { isValidObjectId } = require("mongoose");
 
 //@internal module
-const { User, Leave, TotalLeaveOfUser } = require("../models/modelExporter");
+const { User, 
+        Leave, 
+        TotalLeaveOfUser } = require("../models/modelExporter");
 const { pagination, 
         generateAuthToken } = require("../utils/common");
 
 //@desc Authorize user & get token during login
-//@route POST /api/users/login
+//@route Post /api/users/login
 //@access hr/branch-hr
 const loginUser = asyncHandler(async (req, res) => {
 
@@ -37,7 +39,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
 });
 
-//@http://localhost:8000/api/users
+//@desc show all users
+//@route Get /api/users
 //@ACCESS hr
 const allUsers = asyncHandler(async(req, res) => {
 
@@ -58,8 +61,8 @@ const allUsers = asyncHandler(async(req, res) => {
 });
 
 //@desc Create New User
-//@http://localhost:8000/api/users
-//@ACCESS hr
+//@route Post /api/users
+//@access hr/branch-hr
 const createUser = asyncHandler(async (req, res) => {
 
     try {
@@ -105,7 +108,7 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 //@desc Update user profile
-//@http://localhost:8000/api/users?id=
+//@route Put /api/users?id=
 //@access hr/branch-hr
 const editUser = asyncHandler(async (req, res) => {
 
@@ -146,7 +149,7 @@ const editUser = asyncHandler(async (req, res) => {
 });
 
 //@desc Delete single user
-//@http://localhost:8000/api/users?id=
+//@route Delete /api/users?id=
 //@access hr
 const deleteUser = asyncHandler(async (req, res) => {
 
@@ -171,7 +174,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 //@desc get own profile
-//@http://localhost:8000/api/users/my-profile
+//@route Get /api/users/my-profile
 //@access hr/branch-hr
 const ownProfile = asyncHandler(async(req, res) => {
 
@@ -188,8 +191,8 @@ const ownProfile = asyncHandler(async(req, res) => {
 });
 
 //@desc get other profile & total leave
-//@http://localhost:8000/api/users/profile?id=<user_id>
-//@access hr
+//@route Get /api/users/profile?id=<user_id>
+//@access hr/branch-hr
 const otherProfile = asyncHandler(async(req, res) => {
 
     try {
@@ -220,6 +223,9 @@ const otherProfile = asyncHandler(async(req, res) => {
 
 });
 
+//@desc get concern & department wise user
+//@route Get /api/users/concern-department?c_id=<concern_id>&d_id=<department_id>
+//@access hr/branch-hr
 const concernAndDepartmentWiseUser = asyncHandler(async(req, res) => {
     
     try {
@@ -268,6 +274,7 @@ const generateUsers = asyncHandler(async (req, res) => {
     }
 });
 
+//@exports
 module.exports = {  loginUser,
                     allUsers,
                     createUser,
