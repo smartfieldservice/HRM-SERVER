@@ -41,7 +41,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 //@desc show all users
 //@route Get /api/users
-//@ACCESS hr
+//@access hr
 const allUsers = asyncHandler(async(req, res) => {
 
     try {

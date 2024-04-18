@@ -4,10 +4,12 @@ const { isValidObjectId } = require("mongoose");
 
 //@internal module
 const { Concern } = require("../models/modelExporter");
-const { generateSlug, pagination } =require("../utils/common");
+const { generateSlug, 
+        pagination } =require("../utils/common");
 
-//@get all concern
-//@access by super HR
+//@desc get all concern
+//route Get /api/concern?page=&limit=&sort=
+//@access hr
 const allConcern = asyncHandler(async(req,res) => {
 
     try {
@@ -33,8 +35,9 @@ const allConcern = asyncHandler(async(req,res) => {
 
 });
 
-//@create concern
-//@access by super HR
+//@desc create a new concern
+//@route Post /api/concern
+//@access hr
 const createConcern = asyncHandler(async (req, res) => {
    
     try {
@@ -65,8 +68,9 @@ const createConcern = asyncHandler(async (req, res) => {
     }
 });
 
-//@edit concern
-//@access by super HR
+//@desc edit concern
+//@route Put /api/concern?id=<concern_id>
+//@access hr
 const editConcern = asyncHandler(async (req, res) => {
     
     try {
@@ -108,8 +112,9 @@ const editConcern = asyncHandler(async (req, res) => {
 
 });
 
-//@delete concern
-//@access by super HR
+//@desc delete concern
+//@route Delete /api/concern?id=<concern_id>
+//@access hr
 const deleteConcern = asyncHandler(async(req, res) => {
 
     try {
