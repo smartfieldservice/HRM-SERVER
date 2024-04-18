@@ -4,7 +4,7 @@ const faker = require("faker");
 const { isValidObjectId } = require("mongoose");
 
 //@internal module
-const { User, Leave } = require("../models/modelExporter");
+const { User, Leave, TotalLeaveOfUser } = require("../models/modelExporter");
 const { pagination, 
         generateAuthToken } = require("../utils/common");
 
@@ -206,10 +206,12 @@ const otherProfile = asyncHandler(async(req, res) => {
                 res.status(404).json({ message: "Not found" });
             }else{
 
-                //@for total leave of this employee
-                const totalLeave = await Leave.find({ employeeId : req.query.id });
+                //@for all leave of this employee
+                const allLeaves = await Leave.find({ employeeId : req.query.id });
+                //@for total leave sum of this employee
+                const totalLeaves = await TotalLeaveOfUser.find({ employeeId : req.query.id });
                 
-                res.status(404).json({ message: "User found", data : user , leave : totalLeave });
+                res.status(404).json({ message: "User found", data : user , allLeaves ,  totalLeaves });
             }
         }
     } catch (error) {

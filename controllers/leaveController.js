@@ -1,11 +1,9 @@
 //@external module
 const asyncHandler = require('express-async-handler');
-const mongoose = require('mongoose');
 
 //@internal module
 const { Leave, TotalLeaveOfUser } = require('../models/modelExporter');
 const { escapeString, 
-        generateSlug, 
         pagination} = require('../utils/common');
 const { isValidObjectId } = require('mongoose');
 
