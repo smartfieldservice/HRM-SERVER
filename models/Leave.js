@@ -19,10 +19,13 @@ const leaveSchema = new mongoose.Schema(
         },
         duration: {
             type: String,
+            enum : ['half_day', 'full_day'],
+            default : 'full_day'
         },
         leavetype: {
             type: String,
-            required: true,
+            enum : ['sick', 'casual','other'],
+            default : 'casual'
         },
         startdate: {
             type: String,
@@ -33,7 +36,8 @@ const leaveSchema = new mongoose.Schema(
             required: true
         },
         totaldays: {
-            type: Number
+            type: Number,
+            default : 0
         },
         description: {
             type: String
