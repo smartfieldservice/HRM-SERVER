@@ -25,7 +25,7 @@ router
 router
     .route("/login")
     //@api/users/login
-    .post(accountValidation.isLogout,userController.loginUser)
+    .post(userController.loginUser)
 
 router
     .route("/my-profile")

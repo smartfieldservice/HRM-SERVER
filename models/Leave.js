@@ -13,7 +13,7 @@ const leaveSchema = new mongoose.Schema(
             default : null
         },
         employeeId: {
-            type: String,
+            type: Schema.ObjectId,
             ref : "user",
             required: true 
         },

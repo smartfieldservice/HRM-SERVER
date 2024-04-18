@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+const { mongoose, Schema} = require("mongoose");
 
 const TotalLeaveOfUserSchema = mongoose.Schema(
     {
         employeeId: {
-            type: String,
+            type: Schema.ObjectId,
             ref : "user",
             required: true 
         },

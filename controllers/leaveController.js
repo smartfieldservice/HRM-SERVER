@@ -1,8 +1,9 @@
 //@external module
 const asyncHandler = require('express-async-handler');
+const mongoose = require('mongoose');
 
 //@internal module
-const { Leave } = require('../models/modelExporter');
+const { Leave, TotalLeaveOfUser } = require('../models/modelExporter');
 const { escapeString, 
         generateSlug, 
         pagination} = require('../utils/common');
@@ -74,8 +75,8 @@ const createLeave = asyncHandler(async (req, res) => {
         
         const { concernId, departmentId, employeeId, duration, 
             leavetype, startdate, enddate, totaldays, description } = req.body;
-
-        const leave = new Leave({
+        
+        const leave =  await Leave.create({
             concernId,
             departmentId,
             employeeId,
@@ -87,14 +88,40 @@ const createLeave = asyncHandler(async (req, res) => {
             description
         });
 
-        await leave.save();
+        const employeeLeave = await TotalLeaveOfUser.findOne({ employeeId });
+
+        let addLeaveToEmployee;
+
+        if(employeeLeave){ 
+
+            //@since employee already exist, so just update it
+            addLeaveToEmployee = await TotalLeaveOfUser.findOneAndUpdate({
+                    employeeId
+                },{
+                    $inc: {
+                        totalSick: leavetype === 'sick' ? totaldays : 0,
+                        totalCasual: leavetype === 'casual' ? totaldays : 0
+                    }
+                },{ 
+                    new : true
+            });
+
+        }else{
+
+            //@since employee not exist, so add a new record
+            addLeaveToEmployee = await TotalLeaveOfUser.create({
+                employeeId,
+                totalSick: leavetype === 'sick' ? totaldays : 0,
+                totalCasual: leavetype === 'casual' ? totaldays : 0
+            });
+        }
+        
         res.status(200).json({ message : "Added successfully", data : leave }); 
 
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
 });
-
 
 // @desc edit Leave
 // @route Put /api/leave
@@ -135,7 +162,6 @@ const editLeave = asyncHandler(async(req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
-
 
 // @desc delete Leave
 // @route Delete /api/leave
