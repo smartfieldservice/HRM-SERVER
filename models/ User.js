@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        employeeId: {
+        officeId: {
             type: String,
             required: true
         },
@@ -92,4 +92,4 @@ userSchema.pre("save", async function (next) {
     this.password = bcrypt.hash(this.password, salt);
 });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("user", userSchema);

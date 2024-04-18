@@ -64,7 +64,7 @@ const createUser = asyncHandler(async (req, res) => {
 
     try {
 
-        const { name, email, mobile, emargencyMobile, employeeId, designation, presentaddress, 
+        const { name, email, mobile, emargencyMobile, officeId, designation, presentaddress, 
             permanentaddress, city, country, password, role, concernId, departmentId } = req.body;
 
         let user = await User.findOne({ email });
@@ -79,7 +79,7 @@ const createUser = asyncHandler(async (req, res) => {
                 email,
                 mobile,
                 emargencyMobile,
-                employeeId,
+                officeId,
                 designation,
                 presentaddress,
                 permanentaddress,

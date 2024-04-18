@@ -49,6 +49,9 @@ const allLeave = asyncHandler(async(req, res) => {
             leaves = Leave.find({ concernId });
         }
 
+        leaves = leaves.populate({ path : 'concernId departmentId employeeId', 
+                                select : 'name name name'});
+
         let sortBy = "-createdAt";
         if(req.query.sort){
             sortBy = req.query.sort.replace(","," ");
