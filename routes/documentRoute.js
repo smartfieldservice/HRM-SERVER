@@ -18,9 +18,5 @@ router
     .put(documentController.editDocument)
     .delete(documentController.deleteDocument)
 
-router
-    .route("/search")
-    .get(documentController.searchDocument)
-
 //@exports
 module.exports = router;

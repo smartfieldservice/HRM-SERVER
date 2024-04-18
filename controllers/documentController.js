@@ -2,13 +2,12 @@
 const { isValidObjectId } = require("mongoose");
 
 //@internal module
-const Document = require("../models/Document");
+const { Document } = require("../models/modelExporter");
 const { pagination, 
-        escapeString,
         generateSlug } = require("../utils/common");
 
-//@show all document
-//@http://localhost:8000/api/document/all
+//@desc get all documents
+//@route Get /api/document?page=1&limit=3&sort=
 //@access hr/branch-hr
 const allDocument = async(req, res) => {
     
@@ -48,33 +47,8 @@ const allDocument = async(req, res) => {
     }
 }
 
-//@search a document using params
-//@http://localhost:8000/api/document/search/:doc
-//@access hr/branch-hr
-const searchDocument = async( req, res) => {
-    
-    try {
-        
-        if(req.params.doc !== ""){
-            
-            const searchQuery = new RegExp( escapeString(req.params.doc),"i" );
-
-            const documentData = await Document.find({
-                $or  : [
-                    { title : searchQuery},
-                    { description : searchQuery}
-                ]
-            });
-            
-            res.status(201).json({message : `${documentData.length} document's found !`,documentData});
-        }
-    } catch (error) {
-        res.status(400).json(error.message);
-    }
-}
-
-//@add a new document
-//@http://localhost:8000/api/document/
+//@create a new document
+//@route Post /api/document/
 //@access hr/branch-hr
 const createDocument = async( req, res) => {
     
@@ -114,8 +88,8 @@ const createDocument = async( req, res) => {
     }
 }
 
-//@edit a document using id as query
-//@http://localhost:8000/api/document?id=
+//@edit a document
+//@route Put /api/document?id=<document_id>
 //@access hr/branch-hr
 const editDocument = async( req, res) => {
     
@@ -151,8 +125,8 @@ const editDocument = async( req, res) => {
     }
 }
 
-//@delete a document using id as query
-//@http://localhost:8000/api/document?id=
+//@delete a document
+//@route Delete /api/document?id=<document_id>
 //@access hr/branch-hr
 const deleteDocument = async( req, res) => {
     
@@ -180,7 +154,6 @@ const deleteDocument = async( req, res) => {
 
 //exports
 module.exports = {  allDocument,
-                    searchDocument,
                     createDocument,
                     editDocument,
                     deleteDocument
