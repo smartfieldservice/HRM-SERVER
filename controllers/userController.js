@@ -220,6 +220,31 @@ const otherProfile = asyncHandler(async(req, res) => {
 
 });
 
+const concernAndDepartmentWiseUser = asyncHandler(async(req, res) => {
+    
+    try {
+
+        if(!isValidObjectId(req.query.c_id) || !isValidObjectId(req.query.d_id)){
+            
+            res.status(209).json({ message : "Invalid Id !"});
+        
+        }else{
+
+            const users = await User.find({ 
+                $and : [
+                    { concernId : req.query.c_id },
+                    { departmentId : req.query.d_id }
+                ]
+            });
+    
+            res.status(200).json({ message : `${users.length} users found !`, data : users });
+        }
+       
+    } catch (error) {
+        res.status(400).json({ message : error.message });
+    }
+});
+
 //@desc Generate Many new Users
 const generateUsers = asyncHandler(async (req, res) => {
     let users = [];
@@ -249,5 +274,6 @@ module.exports = {  loginUser,
                     editUser,
                     deleteUser,
                     ownProfile,
-                    otherProfile
+                    otherProfile,
+                    concernAndDepartmentWiseUser
                 }

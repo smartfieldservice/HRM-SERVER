@@ -37,4 +37,9 @@ router
     //@api/users/profile?id=<user_id>
     .get(userController.otherProfile)
 
+router
+    .route("/concern-department")
+    //@/api/users/concern-department?c_id=&d_id=
+    .get(userController.concernAndDepartmentWiseUser)
+
 module.exports = router;
