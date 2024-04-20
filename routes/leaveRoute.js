@@ -5,14 +5,14 @@ const router = require("express").Router();
 const { leaveController } = require("../controllers/controllerExporter");
 const { accountValidation } = require("../middlewares/middlwareExporter");
 
+/* router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr', 'branch-hr']));
+*/
+
 router
     .route("/search/:clue")
     //@api/leave/search/test
     .get(leaveController.searchLeave)
-
-/* router
-    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr', 'branch-hr']));
-*/
 
 router
     .route("/")
