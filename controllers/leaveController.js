@@ -2,23 +2,30 @@
 const asyncHandler = require('express-async-handler');
 
 //@internal module
-const { Leave, TotalLeaveOfUser } = require('../models/modelExporter');
+const { Leave, 
+        TotalLeaveOfUser } = require('../models/modelExporter');
 const { escapeString, 
-        pagination} = require('../utils/common');
+        pagination } = require('../utils/common');
 const { isValidObjectId } = require('mongoose');
 
+//@desc display all Leave
+//@route Get /api/leave/search/:clue
+//@access hr/branch-hr
 const searchLeave = asyncHandler(async(req, res) => {
+    
     try {
 
-        const searchQuery = new RegExp(escapeString(req.params.str),"i");
+        const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
         if(req.params.str !== ""){
             
-            const expenseData = await Leave.find({
-                $or : [{ employeename : searchQuery},{leavetype : searchQuery}]
+            const leave = await Leave.find({
+
+                $or : [{ description : searchQuery },{ leavetype : searchQuery }]
+            
             });
 
-            res.status(201).json({message : `${expenseData.length} expense found !`,expenseData});
+            res.status(201).json({ message : `${leave.length} leave found !`, data : leave });
 
         }
 
@@ -117,7 +124,7 @@ const createLeave = asyncHandler(async (req, res) => {
             });
         }
         
-        res.status(200).json({ message : "Added successfully", data : leave }); 
+        res.status(200).json({ message : "Leave added successfully", data : leave }); 
 
     } catch (error) {
         res.status(400).json({ message : error.message });
@@ -197,9 +204,9 @@ const deleteLeave = asyncHandler(async (req, res) => {
 });
 
 //@exports
-module.exports = {  createLeave, 
+module.exports = {  searchLeave,
+                    createLeave, 
                     allLeave, 
-                    deleteLeave, 
-                    searchLeave, 
+                    deleteLeave,  
                     editLeave
                 };

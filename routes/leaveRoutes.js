@@ -6,22 +6,15 @@ const router = express.Router();
 const { leaveController } = require("../controllers/controllerExporter");
 
 router
+    .route("/search/:clue")
+    .get(leaveController.searchLeave)
+
+router
     .route("/")
     .get(leaveController.allLeave)
     .post(leaveController.createLeave)
     .put(leaveController.editLeave)
     .delete(leaveController.deleteLeave)
 
-/* 
-router.route("/:str").get(searchLeave);
-
-router.route("/")
-    .post(PostLeave)
-    .get(AllleaveData);
-
-router.route("/:Id")
-    .delete(deleteLeave);
-
-router.route("/edit").put(editLeave);
- */
+//@exports    
 module.exports = router;
