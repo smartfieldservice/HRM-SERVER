@@ -1,11 +1,11 @@
-const User = require("../models/ User");
-const Concern = require("../models/Concern");
-const Leave = require("../models/Leave");
-const LeavePerYear = require("../models/LeavePerYear");
-const TotalLeaveOfUser = require("../models/TotalLeaveOfUser");
-const Department = require("../models/Department");
-const Document = require("../models/Document");
-const Expense = require("../models/Expense");
+const User = require("./User");
+const Concern = require("./Concern");
+const Leave = require("./Leave");
+const LeavePerYear = require("./LeavePerYear");
+const TotalLeaveOfUser = require("./TotalLeaveOfUser");
+const Department = require("./Department");
+const Document = require("./Document");
+const Expense = require("./Expense");
 
 module.exports = {  User,
                     Concern,

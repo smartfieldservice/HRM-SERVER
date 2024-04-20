@@ -1,10 +1,10 @@
 const userRoute = require("./userRoute");
-const concernRoute = require("../routes/concernRoute");
-const departmentRoute = require("../routes/departmentRoute");
-const leaveRoute = require("../routes/leaveRoutes");
-const leavePerYearRoute = require("../routes/leavePerYearRoute");
-const expenseRoute = require("../routes/expenseRoute");
-const documentRoute = require("../routes/documentRoute");
+const concernRoute = require("./concernRoute");
+const departmentRoute = require("./departmentRoute");
+const leaveRoute = require("./leaveRoute");
+const leavePerYearRoute = require("./leavePerYearRoute");
+const expenseRoute = require("./expenseRoute");
+const documentRoute = require("./documentRoute");
 
 //@exports
 module.exports = {  userRoute,

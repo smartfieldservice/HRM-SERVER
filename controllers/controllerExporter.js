@@ -1,11 +1,11 @@
-const userController = require("../controllers/userController");
-const concernController = require("../controllers/concernController");
-const leaveController = require("../controllers/leaveController");
-const leavePerYearController = require("../controllers/leavePerYearController");
-const departmentController = require("../controllers/departmentController");
-const documentController = require("../controllers/documentController");
-const employeeController = require("../controllers/employeeController");
-const expenseController = require("../controllers/expenseController");
+const userController = require("./userController");
+const concernController = require("./concernController");
+const leaveController = require("./leaveController");
+const leavePerYearController = require("./leavePerYearController");
+const departmentController = require("./departmentController");
+const documentController = require("./documentController");
+const employeeController = require("./employeeController");
+const expenseController = require("./expenseController");
 
 module.exports = {  userController,
                     concernController,
