@@ -14,10 +14,14 @@ const upload = multer({
 
 /* router
     .use(accountValidation.isLogin, accountValidation.requiredRole(['hr'])); */
+
 router
     .route("/")
+    //@api/concern?page=&limit=&sort=
     .get(concernController.allConcern)
+    //@api/concern
     .post(upload.single('logo'), concernController.createConcern)
+    //@api/concern?id=<concern_id>
     .put(concernController.editConcern)
     .delete(concernController.deleteConcern)
 

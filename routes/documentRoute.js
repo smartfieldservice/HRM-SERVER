@@ -13,8 +13,11 @@ const upload = multer({
 
 router
     .route("/")
+    //@api/document?page=1&limit=3&sort=
     .get(documentController.allDocument)
+    //@api/document
     .post(upload.array('filesName', 5), documentController.createDocument)
+    //@api/document?id=<document_id>
     .put(documentController.editDocument)
     .delete(documentController.deleteDocument)
 

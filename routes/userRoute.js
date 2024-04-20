@@ -39,7 +39,7 @@ router
 
 router
     .route("/concern-department")
-    //@/api/users/concern-department?c_id=&d_id=
+    //@api/users/concern-department?c_id=<concern_id>&d_id=<department_id>
     .get(userController.concernAndDepartmentWiseUser)
 
 module.exports = router;
