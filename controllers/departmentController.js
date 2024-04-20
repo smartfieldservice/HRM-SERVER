@@ -83,7 +83,11 @@ const  createDepartment = asyncHandler(async (req, res) => {
 
         const slug = generateSlug(name);
 
-        let department = await Department.findOne({ slug });
+        let department = await Department.findOne({ $and : [ 
+                { concernId }, 
+                { slug }
+            ] 
+        });
 
         if(department){
             res.status(409).json({ message : "Already exist" });

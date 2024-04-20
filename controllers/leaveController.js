@@ -18,8 +18,34 @@ const searchLeave = asyncHandler(async(req, res) => {
         const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
         if(req.params.str !== ""){
+
+            let concernId = undefined;
+
+            //@after giving the role then use it as concernId
+            //concernId = req.account.concernId;
+
+            let leave;
+
+            if(!concernId){
+                //@hr
+                leave = await Leave.find({
+                    $or : [{ description : searchQuery },{ leavetype : searchQuery }]
+                });
+
+            }else{
+                //@brach-hr
+                leave = await Leave.find({ 
+                    $and : [
+                        { concernId },
+                        { $or : [
+                            { description : searchQuery },
+                            { leavetype : searchQuery }
+                        ]}
+                    ]
+                 });
+            }
             
-            const leave = await Leave.find({
+            leave = await Leave.find({
 
                 $or : [{ description : searchQuery },{ leavetype : searchQuery }]
             
