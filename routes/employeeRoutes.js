@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+//@external module
+const router = require("express").Router();
 const path = require('path');
 const multer = require('multer');
 const shortid = require('shortid');

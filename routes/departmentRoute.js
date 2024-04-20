@@ -1,5 +1,5 @@
-const express = require("express");
-const router = express.Router();
+//@external module
+const router = require("express").Router();
 
 const { departmentController } = require("../controllers/controllerExporter");
 const { accountValidation } = require("../middlewares/middlwareExporter");
