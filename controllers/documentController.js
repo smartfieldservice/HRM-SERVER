@@ -28,7 +28,7 @@ const allDocument = async(req, res) => {
             documents = Document.find({ concernId });
         }
 
-        documents = documents.populate({path:'concernId departmentId' , select:'concern department'});
+        documents = documents.populate({path:'concernId departmentId' , select:'name name'});
 
         let sortBy = "-createdAt";
         if(req.query.sort){
