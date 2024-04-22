@@ -41,17 +41,31 @@ const loginUser = asyncHandler(async (req, res) => {
 
 //@desc show all users
 //@route Get /api/users
-//@access hr
+//@access hr/branch-hr
 const allUsers = asyncHandler(async(req, res) => {
 
     try {
 
-        let { page, limit } = req.query;
+        let concernId = undefined;
 
-        let users = User.find({});
+        //@after giving the role then use it as concernId
+        //concernId = req.account.concernId;
 
-        users = await pagination(page, limit, users);
+        let users;
+        
+        if(!concernId){
+            //@hr
+            users = User.find({});
+        }
+        else{
+            //@branch-hr
+            users = User.find({ concernId });
+        }
 
+        users = users.populate({ path : 'concernId departmentId', select : ['name', 'name']});
+
+        users = await pagination(req.query.page, req.query.limit, users);
+        
         res.status(200).json({ message : `${users.length} users found`, data : users });
         
     } catch (error) {
@@ -150,7 +164,7 @@ const editUser = asyncHandler(async (req, res) => {
 
 //@desc Delete single user
 //@route Delete /api/users?id=
-//@access hr
+//@access hr/branch-hr
 const deleteUser = asyncHandler(async (req, res) => {
 
     try {
