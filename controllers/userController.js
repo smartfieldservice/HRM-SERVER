@@ -68,7 +68,7 @@ const createUser = asyncHandler(async (req, res) => {
     try {
 
         const { name, email, mobile, emargencyMobile, officeId, designation, presentaddress, 
-            permanentaddress, city, country, password, role, concernId, departmentId } = req.body;
+            permanentaddress, city, country, password, role, concernId, departmentId } = req.body; console.log(departmentId)
 
         let user = await User.findOne({ email });
 
@@ -214,7 +214,7 @@ const otherProfile = asyncHandler(async(req, res) => {
                 //@for total leave sum of this employee
                 const totalLeaves = await TotalLeaveOfUser.find({ employeeId : req.query.id });
                 
-                res.status(404).json({ message: "User found", data : user , allLeaves ,  totalLeaves });
+                res.status(200).json({ message: "User found", data : user , allLeaves ,  totalLeaves });
             }
         }
     } catch (error) {
@@ -235,6 +235,8 @@ const concernAndDepartmentWiseUser = asyncHandler(async(req, res) => {
             res.status(209).json({ message : "Invalid Id !"});
         
         }else{
+
+            console.log("i am ")
 
             const users = await User.find({ 
                 $and : [
