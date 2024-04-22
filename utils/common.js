@@ -17,7 +17,7 @@ const pagination = async(pageNo, pageLimit, data) => {
     
     try {
         const page = parseInt(pageNo) || 1;
-        const limit = parseInt(pageLimit) || 10;
+        const limit = parseInt(pageLimit);
         const skip = (page -1) * limit;
 
         return await data.skip(skip).limit(limit);
