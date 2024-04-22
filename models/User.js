@@ -64,6 +64,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: ["hr", "branch-hr", "employee"],
             required: true,
+            default : "employee"
         },
     },
     {
