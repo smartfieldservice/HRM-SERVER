@@ -5,13 +5,15 @@ const cors = require("cors");
 const dotenv = require('dotenv');
 const logger = require('morgan');
 
+//@internal module
 const { userRoute,
         concernRoute,
         departmentRoute,
         leaveRoute,
         leavePerYearRoute,
         expenseRoute,
-        documentRoute } = require("../routes/routeExporter");
+        documentRoute,
+        dashboardRoute } = require("../routes/routeExporter");
 
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
@@ -34,5 +36,6 @@ module.exports = async(app) => {
         .use("/api/leave", leaveRoute)
         .use("/api/leave-per-year", leavePerYearRoute)
         .use("/api/expense", expenseRoute)
+        .use("/api/dashboard", dashboardRoute)
 
 }

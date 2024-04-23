@@ -5,6 +5,7 @@ const leaveRoute = require("./leaveRoute");
 const leavePerYearRoute = require("./leavePerYearRoute");
 const expenseRoute = require("./expenseRoute");
 const documentRoute = require("./documentRoute");
+const dashboardRoute = require("./dashboardRoute");
 
 //@exports
 module.exports = {  userRoute,
@@ -13,5 +14,6 @@ module.exports = {  userRoute,
                     leaveRoute,
                     leavePerYearRoute,
                     expenseRoute,
-                    documentRoute
+                    documentRoute,
+                    dashboardRoute
                 }

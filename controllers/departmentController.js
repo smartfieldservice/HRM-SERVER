@@ -68,7 +68,7 @@ const allDepartment = asyncHandler(async(req, res) => {
         res.status(200).json({ message : `${departments.length} departments found`, data : departments });
 
     }catch(error){
-        res.json({ message: error});
+        res.status(404).json({ message: error});
     }
 });
 

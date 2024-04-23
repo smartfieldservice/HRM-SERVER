@@ -6,6 +6,7 @@ const departmentController = require("./departmentController");
 const documentController = require("./documentController");
 const employeeController = require("./employeeController");
 const expenseController = require("./expenseController");
+const dashboardController = require("./dashboardController");
 
 module.exports = {  userController,
                     concernController,
@@ -14,6 +15,7 @@ module.exports = {  userController,
                     departmentController,
                     documentController,
                     employeeController,
-                    expenseController    
+                    expenseController,
+                    dashboardController    
                 }
 
