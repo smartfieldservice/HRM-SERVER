@@ -41,4 +41,9 @@ router
     //@api/users/concern-department?c_id=<concern_id>&d_id=<department_id>
     .get(userController.concernAndDepartmentWiseUser)
 
+router
+    .route("/search/:clue")
+    //@api/users/search/
+    .get(userController.searchUser)
+
 module.exports = router;

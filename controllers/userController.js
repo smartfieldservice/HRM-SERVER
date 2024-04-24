@@ -8,7 +8,8 @@ const { User,
         Leave, 
         TotalLeaveOfUser } = require("../models/modelExporter");
 const { pagination, 
-        generateAuthToken } = require("../utils/common");
+        generateAuthToken, 
+        escapeString } = require("../utils/common");
 
 //@desc Authorize user & get token during login
 //@route Post /api/users/login
@@ -267,6 +268,36 @@ const concernAndDepartmentWiseUser = asyncHandler(async(req, res) => {
     }
 });
 
+//@desc search users
+//@route Get /api/users/search
+//@access hr/branch-hr
+const searchUser = asyncHandler( async(req, res) => {
+
+    try {
+        
+        const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
+        const mobile = new RegExp( "^" + escapeString( req.params.clue ), "i" );
+
+        if( req.params.clue !== ""){
+
+            const users = await User.find({
+
+                $or : [
+                    { name : searchQuery },
+                    { designation : searchQuery },
+                    { mobile }
+                ]
+            });
+
+            res.status(200).json({ message : `${users.length} users found !`, data : users });
+        }
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });        
+    }
+
+});
+
 //@desc Generate Many new Users
 const generateUsers = asyncHandler(async (req, res) => {
     let users = [];
@@ -298,5 +329,6 @@ module.exports = {  loginUser,
                     deleteUser,
                     ownProfile,
                     otherProfile,
-                    concernAndDepartmentWiseUser
+                    concernAndDepartmentWiseUser,
+                    searchUser
                 }
