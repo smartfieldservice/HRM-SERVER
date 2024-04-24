@@ -218,14 +218,18 @@ const otherProfile = asyncHandler(async(req, res) => {
 
         }else{
 
-            const user = await User.findById({ _id : req.query.id });
+            let user = User.findById({ _id : req.query.id }).populate({ path : 'concernId departmentId', select : ['name', 'name']});
 
             if(!user){
                 res.status(404).json({ message: "Not found" });
             }else{
+                
+                //@details of the user
+                user = await user;
 
                 //@for all leave of this employee
                 const allLeaves = await Leave.find({ employeeId : req.query.id });
+
                 //@for total leave sum of this employee
                 const totalLeaves = await TotalLeaveOfUser.find({ employeeId : req.query.id });
                 
