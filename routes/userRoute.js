@@ -29,7 +29,7 @@ router
 router
     .route("/my-profile")
     //@api/users/my-profile
-    .get(userController.ownProfile)
+    .get(accountValidation.isLogin,userController.ownProfile)
 
 router
     .route("/profile")

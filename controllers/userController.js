@@ -9,7 +9,8 @@ const { User,
         TotalLeaveOfUser } = require("../models/modelExporter");
 const { pagination, 
         generateAuthToken, 
-        escapeString } = require("../utils/common");
+        escapeString, 
+        hashedPassword } = require("../utils/common");
 
 //@desc Authorize user & get token during login
 //@route Post /api/users/login
@@ -19,6 +20,8 @@ const loginUser = asyncHandler(async (req, res) => {
     try {
 
         const { email, password } = req.body;
+
+        console.log(req.body)
 
         const user = await User.findOne({ email });
 
@@ -37,7 +40,6 @@ const loginUser = asyncHandler(async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-
 });
 
 //@desc show all users
@@ -92,6 +94,9 @@ const createUser = asyncHandler(async (req, res) => {
         }
         else{
 
+            //@hash the password
+            const hashPassword = await hashedPassword(password);
+
             user = new User({
                 name,
                 email,
@@ -103,7 +108,7 @@ const createUser = asyncHandler(async (req, res) => {
                 permanentaddress,
                 city,
                 country,
-                password,
+                password : hashPassword,
                 role,
                 concernId,
                 departmentId,
@@ -111,9 +116,7 @@ const createUser = asyncHandler(async (req, res) => {
             });
 
             await user.save();
-
             res.status(200).json({ message : "Added successfully", user });
-
         }
 
     } catch (error) {
@@ -195,14 +198,25 @@ const ownProfile = asyncHandler(async(req, res) => {
 
     try {
         
-        const user = await User.findById({ _id : req.account.id });
+        if(!req.account){
+            res.status(400).json({ message : 'You need to login'});
+        }else{
 
-        res.status(200).json({ message : "Here is your information" , data : user })
+            let user  = User.findById({ _id : req.account.id }).populate({ path : 'concernId departmentId' , select :[ 'name' , 'name']});
 
+            if(!user){
+                res.status(404).json({ message : 'Not found any user !'});
+            }
+            else{
+                
+                //@fetch the data
+                user = await user;
+                res.status(200).json({ message : "Here is your information" , data : user })
+            }
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-
 });
 
 //@desc get other profile & total leave
