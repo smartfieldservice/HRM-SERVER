@@ -5,7 +5,8 @@ const { isValidObjectId } = require('mongoose');
 //@internal module
 const { Department } = require('../models/modelExporter');
 const { generateSlug, 
-        pagination } = require('../utils/common');
+        pagination, 
+        escapeString} = require('../utils/common');
 
 //@desc get concern wise department
 //@route Get /api/department/concern?id=<concern_id>
@@ -179,6 +180,33 @@ const deleteDepartment = asyncHandler(async (req, res) => {
     }catch(error){
         res.status(400).json({ message : error.message });
     }
+});
+
+//@desc search Depratment
+//@route Post /api/department?id=<department_id>
+//@access hr/branch-hr
+const searchDepartment = asyncHandler( async(req, res) => {
+
+    try {
+        
+        const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
+
+        if( req.params.clue !== ""){
+
+            const departments = await Department.find({
+
+                $or : [
+                    { name : searchQuery },
+                    { description : searchQuery }
+                ]
+            });
+
+            res.status(200).json({ message : `${departments.length} result found !`, data : departments });
+        }
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });        
+    }
 
 });
 
@@ -187,5 +215,6 @@ module.exports = {  concernWiseDepartment,
                     allDepartment,
                     createDepartment, 
                     editDepartment,
-                    deleteDepartment
+                    deleteDepartment,
+                    searchDepartment
                 };

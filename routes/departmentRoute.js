@@ -21,5 +21,10 @@ router
     //@api/department?id=<department_id>
     .put(departmentController.editDepartment)
     .delete(departmentController.deleteDepartment)
+
+router
+    .route("/search/:clue")
+    //@api/department/search/ma
+    .get(departmentController.searchDepartment)
     
 module.exports = router;
