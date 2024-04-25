@@ -19,22 +19,25 @@ const searchLeave = asyncHandler(async(req, res) => {
 
         if(req.params.str !== ""){
 
+            /* //@fetch all the leaves
+            let leaves = Leave.find({ }).populate({ path : 'concernId departmentId employeeId', select : 'name name name'});
+ */
             let concernId = undefined;
 
             //@after giving the role then use it as concernId
             //concernId = req.account.concernId;
 
-            let leave;
+            let leaves;
 
             if(!concernId){
                 //@hr
-                leave = await Leave.find({
+                leaves = await Leave.find({
                     $or : [{ description : searchQuery },{ leavetype : searchQuery }]
                 });
 
             }else{
                 //@brach-hr
-                leave = await Leave.find({ 
+                leaves = await Leave.find({ 
                     $and : [
                         { concernId },
                         { $or : [
@@ -42,19 +45,12 @@ const searchLeave = asyncHandler(async(req, res) => {
                             { leavetype : searchQuery }
                         ]}
                     ]
-                 });
+                });
             }
-            
-            leave = await Leave.find({
 
-                $or : [{ description : searchQuery },{ leavetype : searchQuery }]
-            
-            });
-
-            res.status(200).json({ message : `${leave.length} leave found !`, data : leave });
+            res.status(200).json({ message : `${leaves.length} result found !`, data : leaves });
 
         }
-
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

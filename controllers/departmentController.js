@@ -193,13 +193,25 @@ const searchDepartment = asyncHandler( async(req, res) => {
 
         if( req.params.clue !== ""){
 
-            const departments = await Department.find({
-
-                $or : [
-                    { name : searchQuery },
-                    { description : searchQuery }
-                ]
-            });
+            const departments = await Department.aggregate([
+                {
+                  $lookup: {
+                    from: "concerns", 
+                    localField: "concernId",
+                    foreignField: "_id",
+                    as: "concern"
+                  }
+                },
+                {
+                  $match: {
+                    $or: [
+                      { 'concern.name': searchQuery },
+                      { name: searchQuery },
+                      { description: searchQuery }
+                    ]
+                  }
+                }
+              ]);
 
             res.status(200).json({ message : `${departments.length} result found !`, data : departments });
         }
