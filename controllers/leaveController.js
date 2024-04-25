@@ -51,7 +51,7 @@ const searchLeave = asyncHandler(async(req, res) => {
             
             });
 
-            res.status(201).json({ message : `${leave.length} leave found !`, data : leave });
+            res.status(200).json({ message : `${leave.length} leave found !`, data : leave });
 
         }
 

@@ -15,7 +15,7 @@ const searchExpense = async(req, res) => {
                 $or : [{particulars : searchQuery},{purpose : searchQuery}]
             });
 
-            res.status(201).json({message : `${expenseData.length} expense found !`,expenseData});
+            res.status(200).json({message : `${expenseData.length} expense found !`,expenseData});
 
         }
 
@@ -39,7 +39,7 @@ const addExpense = async(req, res) => {
         });
         await expenseData.save();
 
-        res.status(201).json({message : "Data added successfully !",expenseData});
+        res.status(200).json({message : "Data added successfully !",expenseData});
 
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -68,7 +68,7 @@ const editExpense = async(req, res) => {
                     new : true
             });
 
-            res.status(201).json({message : "Edited Successfully !", editExpense});
+            res.status(200).json({message : "Edited Successfully !", editExpense});
             
         }else{
             throw new Error("Data not found !");
@@ -87,7 +87,7 @@ const deleteExpense = async(req, res) => {
 
         if(expenseData){
             await Expense.findByIdAndDelete({_id : req.query.id});
-            res.status(201).json({message : "Deleted Successfully !"});
+            res.status(200).json({message : "Deleted Successfully !"});
         }else{
             throw new Error("Data not found");
         }

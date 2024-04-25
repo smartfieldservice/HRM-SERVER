@@ -40,7 +40,7 @@ const allDocument = async(req, res) => {
 
         documents = await pagination(req.query.page, req.query.limit, documents);
         
-        res.status(201).json({message : `${documents.length} document's found !`,documents });
+        res.status(200).json({message : `${documents.length} document's found !`,documents });
     
     } catch (error) {
         res.status(400).json(error.message);
@@ -117,7 +117,7 @@ const editDocument = async( req, res) => {
                         new : true
                 });
 
-                res.status(201).json({message : "Document edited successfully !"});
+                res.status(200).json({message : "Document edited successfully !"});
             }
         }
     } catch (error) {
@@ -144,7 +144,7 @@ const deleteDocument = async( req, res) => {
             }else{
 
                 await Document.findByIdAndDelete({ _id : req.query.id });
-                res.status(201).json({message : "Document deleted successfully !"});
+                res.status(200).json({message : "Document deleted successfully !"});
             }
         }
     } catch (error) {

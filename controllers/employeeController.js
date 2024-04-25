@@ -27,7 +27,7 @@ const searchEmployee = async(req, res) => {
                     ]
             });
 
-            res.status(201).json({message : `${employeeData.length} employee found !`,employeeData});
+            res.status(200).json({message : `${employeeData.length} employee found !`,employeeData});
 
         }
     } catch (error) {
@@ -60,7 +60,7 @@ const PostEmployee = asyncHandler(async (req, res) => {
     });
     try{
         const EmployeeForm = await EmployeeData.save();
-        res.status(201);
+        res.status(200);
         res.json(EmployeeForm);
     }catch(err){
         res.json({ message: err });
@@ -93,7 +93,7 @@ const editEmployee = async(req, res) => {
                     new : true
             });
 
-            res.status(201).json({message : "Edited Successfully !", editEmployee});
+            res.status(200).json({message : "Edited Successfully !", editEmployee});
         }else{
             throw new Error("Data not found !");
         }
