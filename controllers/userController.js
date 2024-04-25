@@ -85,7 +85,7 @@ const createUser = asyncHandler(async (req, res) => {
     try {
 
         const { name, email, mobile, emargencyMobile, officeId, designation, presentaddress, 
-            permanentaddress, city, country, password, role, concernId, departmentId } = req.body; console.log(departmentId)
+            permanentaddress, city, country, password, role, concernId, departmentId } = req.body;
 
         let user = await User.findOne({ email });
 
