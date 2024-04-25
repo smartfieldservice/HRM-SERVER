@@ -307,7 +307,7 @@ const searchUser = asyncHandler( async(req, res) => {
                 ]
             });
 
-            res.status(200).json({ message : `${users.length} users found !`, data : users });
+            res.status(200).json({ message : `${users.length} result found !`, data : users });
         }
 
     } catch (error) {

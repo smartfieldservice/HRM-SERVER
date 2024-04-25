@@ -5,7 +5,8 @@ const { isValidObjectId } = require("mongoose");
 //@internal module
 const { Concern } = require("../models/modelExporter");
 const { generateSlug, 
-        pagination } =require("../utils/common");
+        pagination, 
+        escapeString} =require("../utils/common");
 
 //@desc get all concern
 //route Get /api/concern?page=&limit=&sort=
@@ -143,9 +144,38 @@ const deleteConcern = asyncHandler(async(req, res) => {
 
 });
 
+//@desc search concern
+//@route Get /api/concern/search
+//@access hr
+const searchConcern = asyncHandler(async(req, res) => {
+
+    try {
+        
+        const searchQuery = new RegExp( escapeString( req.params.clue), "i");
+
+        if(req.params.clue !== ""){
+
+            const concerns = await Concern.find({
+
+                $or : [
+                    { name : searchQuery },
+                    { address : searchQuery },
+                    { description : searchQuery }
+                ]
+            });
+
+            res.status(200).json({ message : `${concerns.length} result found !`, data : concerns });
+        }
+
+    } catch (error) {
+        res.status(400).json({ message : error.message });
+    }
+});
+
 //@exports
 module.exports = {  allConcern,
                     createConcern,
                     editConcern,
-                    deleteConcern
+                    deleteConcern,
+                    searchConcern
                 }

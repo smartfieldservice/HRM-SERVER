@@ -24,4 +24,9 @@ router
     .put(concernController.editConcern)
     .delete(concernController.deleteConcern)
 
+router
+    .route("/search/:clue")
+    //@api/concern/search/attin
+    .get(concernController.searchConcern)
+
 module.exports = router
