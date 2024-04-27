@@ -159,8 +159,7 @@ const searchConcern = asyncHandler(async(req, res) => {
 
                 $or : [
                     { name : searchQuery },
-                    { address : searchQuery },
-                    { description : searchQuery }
+                    { address : searchQuery }
                 ]
             });
 

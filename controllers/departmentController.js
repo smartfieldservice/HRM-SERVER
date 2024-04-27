@@ -216,8 +216,7 @@ const searchDepartment = asyncHandler( async(req, res) => {
                         $match: {
                             $or: [
                                 { 'concern.name': searchQuery },
-                                { name: searchQuery },
-                                { description: searchQuery }
+                                { name: searchQuery }
                             ]
                         }
                     }
@@ -231,8 +230,7 @@ const searchDepartment = asyncHandler( async(req, res) => {
                     $and : [
                         { concernId : new ObjectId(concernId) },
                         { $or : [
-                            { name : searchQuery },
-                            { description : searchQuery }
+                            { name : searchQuery }
                         ]}
                     ]
                 })
