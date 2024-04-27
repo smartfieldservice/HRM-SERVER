@@ -1,6 +1,7 @@
 //@external module
 const asyncHandler = require('express-async-handler');
 const { isValidObjectId } = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 //@internal module
 const { Department } = require('../models/modelExporter');
@@ -193,25 +194,49 @@ const searchDepartment = asyncHandler( async(req, res) => {
 
         if( req.params.clue !== ""){
 
-            const departments = await Department.aggregate([
-                {
-                  $lookup: {
-                    from: "concerns", 
-                    localField: "concernId",
-                    foreignField: "_id",
-                    as: "concern"
-                  }
-                },
-                {
-                  $match: {
-                    $or: [
-                      { 'concern.name': searchQuery },
-                      { name: searchQuery },
-                      { description: searchQuery }
+            let concernId = undefined;
+
+            //@after giving the role then use it as concernId
+            //concernId = req.account.concernId;
+
+            let departments;
+
+            if(!concernId){
+                //@hr
+                departments = await Department.aggregate([
+                    {
+                        $lookup: {
+                            from: "concerns", 
+                            localField: "concernId",
+                            foreignField: "_id",
+                            as: "concern"
+                        }
+                    },
+                    {
+                        $match: {
+                            $or: [
+                                { 'concern.name': searchQuery },
+                                { name: searchQuery },
+                                { description: searchQuery }
+                            ]
+                        }
+                    }
+                ]);
+
+            }else{
+                //@brach-hr
+                console.log(req.account);
+
+                departments = await Department.find({
+                    $and : [
+                        { concernId : new ObjectId(concernId) },
+                        { $or : [
+                            { name : searchQuery },
+                            { description : searchQuery }
+                        ]}
                     ]
-                  }
-                }
-              ]);
+                })
+            }
 
             res.status(200).json({ message : `${departments.length} result found !`, data : departments });
         }

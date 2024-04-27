@@ -15,7 +15,7 @@ router
 router
     .route("/")
     //@api/department?page=&limit=&sort=
-    .get(departmentController.allDepartment)
+    .get(accountValidation.isLogin,departmentController.allDepartment)
     //@api/department
     .post(departmentController.createDepartment)
     //@api/department?id=<department_id>
@@ -25,6 +25,6 @@ router
 router
     .route("/search/:clue")
     //@api/department/search/ma
-    .get(departmentController.searchDepartment)
+    .get(accountValidation.isLogin,departmentController.searchDepartment)
     
 module.exports = router;
