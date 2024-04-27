@@ -32,26 +32,26 @@ const searchLeave = asyncHandler(async(req, res) => {
                 leaves = await Leave.aggregate([
                     {
                         $lookup: {
-                          from: "concerns", 
-                          localField: "concernId",
-                          foreignField: "_id",
-                          as: "concern"
+                            from: "concerns", 
+                            localField: "concernId",
+                            foreignField: "_id",
+                            as: "concern"
                         }
                     },
                     {
                         $lookup: {
-                          from: "departments", 
-                          localField: "departmentId",
-                          foreignField: "_id",
-                          as: "department"
+                            from: "departments", 
+                            localField: "departmentId",
+                            foreignField: "_id",
+                            as: "department"
                         }
                     },
                     {
                         $lookup: {
-                          from: "users", 
-                          localField: "employeeId",
-                          foreignField: "_id",
-                          as: "user"
+                            from: "users", 
+                            localField: "employeeId",
+                            foreignField: "_id",
+                            as: "user"
                         }
                     },
                     {
@@ -60,7 +60,6 @@ const searchLeave = asyncHandler(async(req, res) => {
                                 { 'concern.name': searchQuery },
                                 { 'department.name': searchQuery },
                                 { 'user.name': searchQuery },
-                                { description: searchQuery },
                                 { leavetype: searchQuery },
                             ]
                         }
@@ -74,30 +73,31 @@ const searchLeave = asyncHandler(async(req, res) => {
                 leaves = await Leave.aggregate([
                     {
                         $lookup: {
-                          from: "departments", 
-                          localField: "departmentId",
-                          foreignField: "_id",
-                          as: "department"
+                            from: "departments", 
+                            localField: "departmentId",
+                            foreignField: "_id",
+                            as: "department"
                         }
                     },
                     {
                         $lookup: {
-                          from: "users", 
-                          localField: "employeeId",
-                          foreignField: "_id",
-                          as: "user"
+                            from: "users", 
+                            localField: "employeeId",
+                            foreignField: "_id",
+                            as: "user"
                         }
                     },
                     {
                         $match: {
-                            $and : [
+                            $and: [
                                 { concernId : new ObjectId(concernId) },
-                                { $or: [
-                                    { 'department.name': searchQuery },
-                                    { 'user.name': searchQuery },
-                                    { description: searchQuery },
-                                    { leavetype: searchQuery },
-                                ]}
+                                { 
+                                    $or: [
+                                        { 'department.name': searchQuery },
+                                        { 'user.name': searchQuery },
+                                        { leavetype: searchQuery }
+                                    ]
+                                }
                             ]
                         }
                     }

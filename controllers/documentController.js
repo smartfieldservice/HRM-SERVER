@@ -1,15 +1,18 @@
 //@external module
+const asyncHandler = require('express-async-handler');
+const { ObjectId } = require('mongodb');
 const { isValidObjectId } = require("mongoose");
 
 //@internal module
 const { Document } = require("../models/modelExporter");
 const { pagination, 
-        generateSlug } = require("../utils/common");
+        generateSlug, 
+        escapeString} = require("../utils/common");
 
 //@desc get all documents
 //@route Get /api/document?page=1&limit=3&sort=
 //@access hr/branch-hr
-const allDocument = async(req, res) => {
+const allDocument = asyncHandler(async(req, res) => {
     
     try {
 
@@ -45,12 +48,12 @@ const allDocument = async(req, res) => {
     } catch (error) {
         res.status(400).json(error.message);
     }
-}
+});
 
 //@create a new document
 //@route Post /api/document/
 //@access hr/branch-hr
-const createDocument = async( req, res) => {
+const createDocument = asyncHandler(async( req, res) => {
     
     try {
 
@@ -86,12 +89,12 @@ const createDocument = async( req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-}
+});
 
 //@edit a document
 //@route Put /api/document?id=<document_id>
 //@access hr/branch-hr
-const editDocument = async( req, res) => {
+const editDocument = asyncHandler(async( req, res) => {
     
     try {
 
@@ -123,12 +126,12 @@ const editDocument = async( req, res) => {
     } catch (error) {
         res.status(400).json(error.message);
     }
-}
+});
 
 //@delete a document
 //@route Delete /api/document?id=<document_id>
 //@access hr/branch-hr
-const deleteDocument = async( req, res) => {
+const deleteDocument = asyncHandler(async( req, res) => {
     
     try {
 
@@ -150,11 +153,94 @@ const deleteDocument = async( req, res) => {
     } catch (error) {
         res.status(400).json(error.message);
     }
-}
+});
+
+const searchDocument = asyncHandler(async(req, res) => {
+
+    try {
+        
+        const searchQuery = new RegExp( escapeString(req.params.clue), "i");
+
+        if(req.params.str !== ""){
+
+            let concernId = undefined;
+
+            //@after giving the role then use it as concernId
+            //concernId = req.account.concernId;
+
+            let documents;
+
+            if(!concernId){
+                //@hr
+                documents = await Document.aggregate([
+                    {
+                        $lookup: {
+                            from: "concerns", 
+                            localField: "concernId",
+                            foreignField: "_id",
+                            as: "concern"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "departments", 
+                            localField: "departmentId",
+                            foreignField: "_id",
+                            as: "department"
+                        }
+                    },
+                    {
+                        $match:{
+                            $or:[
+                                { 'concern.name': searchQuery },
+                                { 'department.name': searchQuery },
+                                { title: searchQuery },
+                            ]
+                        }
+                    }
+                ]);
+            }else{
+                //@brach-hr
+                //console.log(req.account);
+
+                documents = await Document.aggregate([
+                    {
+                        $lookup: {
+                            from: "departments", 
+                            localField: "departmentId",
+                            foreignField: "_id",
+                            as: "department"
+                        }
+                    },
+                    {
+                        $match:{
+                            $and: [
+                                { concernId : new ObjectId(concernId) },
+                                {
+                                    $or: [
+                                        { 'department.name': searchQuery },
+                                        { title: searchQuery },
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]);
+            }
+
+            res.status(200).json({ message : `${documents.length} result found !`, data : documents });
+
+        }
+    } catch (error) {
+        res.status(400).json(error.message);
+    }
+
+});
 
 //exports
 module.exports = {  allDocument,
                     createDocument,
                     editDocument,
-                    deleteDocument
+                    deleteDocument,
+                    searchDocument
                 }

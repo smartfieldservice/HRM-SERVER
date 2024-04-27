@@ -4,7 +4,8 @@ const multer = require("multer");
 
 //@internal module
 const { documentController } = require("../controllers/controllerExporter");
-const { s3Handler } = require("../middlewares/middlwareExporter");
+const { s3Handler, 
+        accountValidation } = require("../middlewares/middlwareExporter");
 
 const upload = multer({
     storage : s3Handler.storageConfig
@@ -19,6 +20,10 @@ router
     //@api/document?id=<document_id>
     .put(documentController.editDocument)
     .delete(documentController.deleteDocument)
+
+router
+    .route("/search/:clue")
+    .get(/* accountValidation.isLogin, */documentController.searchDocument)
 
 //@exports
 module.exports = router;
