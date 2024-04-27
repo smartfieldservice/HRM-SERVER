@@ -145,7 +145,7 @@ const deleteConcern = asyncHandler(async(req, res) => {
 });
 
 //@desc search concern
-//@route Get /api/concern/search
+//@route Get /api/concern/search/:clue
 //@access hr
 const searchConcern = asyncHandler(async(req, res) => {
 

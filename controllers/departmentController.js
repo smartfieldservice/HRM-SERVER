@@ -184,7 +184,7 @@ const deleteDepartment = asyncHandler(async (req, res) => {
 });
 
 //@desc search Depratment
-//@route Post /api/department?id=<department_id>
+//@route Get /api/department/search/:clue
 //@access hr/branch-hr
 const searchDepartment = asyncHandler( async(req, res) => {
 

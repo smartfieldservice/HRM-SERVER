@@ -155,6 +155,9 @@ const deleteDocument = asyncHandler(async( req, res) => {
     }
 });
 
+//@desc search document
+//@route Get /api/document/search/:clue
+//@access hr/branch-hr
 const searchDocument = asyncHandler(async(req, res) => {
 
     try {

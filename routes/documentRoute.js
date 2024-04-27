@@ -23,6 +23,7 @@ router
 
 router
     .route("/search/:clue")
+    //@api/document/search/test
     .get(/* accountValidation.isLogin, */documentController.searchDocument)
 
 //@exports
