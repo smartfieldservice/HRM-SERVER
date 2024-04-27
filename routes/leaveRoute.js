@@ -12,7 +12,7 @@ const { accountValidation } = require("../middlewares/middlwareExporter");
 router
     .route("/search/:clue")
     //@api/leave/search/test
-    .get(leaveController.searchLeave)
+    .get(/* accountValidation.isLogin, */leaveController.searchLeave)
 
 router
     .route("/")

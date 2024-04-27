@@ -1,5 +1,6 @@
 //@external module
 const asyncHandler = require('express-async-handler');
+const { ObjectId } = require('mongodb');
 
 //@internal module
 const { Leave, 
@@ -19,9 +20,6 @@ const searchLeave = asyncHandler(async(req, res) => {
 
         if(req.params.str !== ""){
 
-            /* //@fetch all the leaves
-            let leaves = Leave.find({ }).populate({ path : 'concernId departmentId employeeId', select : 'name name name'});
- */
             let concernId = undefined;
 
             //@after giving the role then use it as concernId
@@ -31,21 +29,79 @@ const searchLeave = asyncHandler(async(req, res) => {
 
             if(!concernId){
                 //@hr
-                leaves = await Leave.find({
-                    $or : [{ description : searchQuery },{ leavetype : searchQuery }]
-                });
+                leaves = await Leave.aggregate([
+                    {
+                        $lookup: {
+                          from: "concerns", 
+                          localField: "concernId",
+                          foreignField: "_id",
+                          as: "concern"
+                        }
+                    },
+                    {
+                        $lookup: {
+                          from: "departments", 
+                          localField: "departmentId",
+                          foreignField: "_id",
+                          as: "department"
+                        }
+                    },
+                    {
+                        $lookup: {
+                          from: "users", 
+                          localField: "employeeId",
+                          foreignField: "_id",
+                          as: "user"
+                        }
+                    },
+                    {
+                        $match: {
+                            $or: [
+                                { 'concern.name': searchQuery },
+                                { 'department.name': searchQuery },
+                                { 'user.name': searchQuery },
+                                { description: searchQuery },
+                                { leavetype: searchQuery },
+                            ]
+                        }
+                    }
+                ]);
 
             }else{
                 //@brach-hr
-                leaves = await Leave.find({ 
-                    $and : [
-                        { concernId },
-                        { $or : [
-                            { description : searchQuery },
-                            { leavetype : searchQuery }
-                        ]}
-                    ]
-                });
+                //console.log(req.account);
+
+                leaves = await Leave.aggregate([
+                    {
+                        $lookup: {
+                          from: "departments", 
+                          localField: "departmentId",
+                          foreignField: "_id",
+                          as: "department"
+                        }
+                    },
+                    {
+                        $lookup: {
+                          from: "users", 
+                          localField: "employeeId",
+                          foreignField: "_id",
+                          as: "user"
+                        }
+                    },
+                    {
+                        $match: {
+                            $and : [
+                                { concernId : new ObjectId(concernId) },
+                                { $or: [
+                                    { 'department.name': searchQuery },
+                                    { 'user.name': searchQuery },
+                                    { description: searchQuery },
+                                    { leavetype: searchQuery },
+                                ]}
+                            ]
+                        }
+                    }
+                ]);
             }
 
             res.status(200).json({ message : `${leaves.length} result found !`, data : leaves });
