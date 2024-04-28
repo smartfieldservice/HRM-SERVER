@@ -16,19 +16,21 @@ const allDocument = asyncHandler(async(req, res) => {
     
     try {
 
-        let concernId = undefined;
+        let role = "hr"; 
+
+        //console.log(req.account);
         
-        //@after giving the role then use it as concernId
-        //concernId = req.account.concernId;
+        //@after giving route protection 
+        //role = req.account.role;
 
         let documents;
 
-        if(!concernId){
+        if(role === "hr"){
             //@hr
             documents = Document.find({ }); 
         }else{
             //@branch-hr
-            documents = Document.find({ concernId });
+            documents = Document.find({ concernId: req.account.concernId });
         }
 
         documents = documents.populate({path:'concernId departmentId' , select:'name name'});
@@ -162,18 +164,20 @@ const searchDocument = asyncHandler(async(req, res) => {
 
     try {
         
-        const searchQuery = new RegExp( escapeString(req.params.clue), "i");
-
         if(req.params.str !== ""){
 
-            let concernId = undefined;
+            const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
-            //@after giving the role then use it as concernId
-            //concernId = req.account.concernId;
+            let role = "hr"; 
+
+            //console.log(req.account);
+        
+            //@after giving route protection 
+            //role = req.account.role;
 
             let documents;
 
-            if(!concernId){
+            if(role === "hr"){
                 //@hr
                 documents = await Document.aggregate([
                     {
@@ -183,16 +187,14 @@ const searchDocument = asyncHandler(async(req, res) => {
                             foreignField: "_id",
                             as: "concern"
                         }
-                    },
-                    {
+                    },{
                         $lookup: {
                             from: "departments", 
                             localField: "departmentId",
                             foreignField: "_id",
                             as: "department"
                         }
-                    },
-                    {
+                    },{
                         $match:{
                             $or:[
                                 { 'concern.name': searchQuery },
@@ -204,8 +206,6 @@ const searchDocument = asyncHandler(async(req, res) => {
                 ]);
             }else{
                 //@brach-hr
-                //console.log(req.account);
-
                 documents = await Document.aggregate([
                     {
                         $lookup: {
@@ -214,11 +214,10 @@ const searchDocument = asyncHandler(async(req, res) => {
                             foreignField: "_id",
                             as: "department"
                         }
-                    },
-                    {
+                    },{
                         $match:{
                             $and: [
-                                { concernId : new ObjectId(concernId) },
+                                { concernId : new ObjectId( req.account.concernId ) },
                                 {
                                     $or: [
                                         { 'department.name': searchQuery },
