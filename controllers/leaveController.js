@@ -16,18 +16,20 @@ const searchLeave = asyncHandler(async(req, res) => {
     
     try {
 
-        const searchQuery = new RegExp( escapeString(req.params.clue), "i");
-
         if(req.params.str !== ""){
 
-            let concernId = undefined;
+            const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
-            //@after giving the role then use it as concernId
-            //concernId = req.account.concernId;
+            let role = "hr"; 
+
+            //console.log(req.account);
+        
+            //@after giving route protection 
+            //role = req.account.role;
 
             let leaves;
 
-            if(!concernId){
+            if(role === "hr"){
                 //@hr
                 leaves = await Leave.aggregate([
                     {
@@ -37,24 +39,21 @@ const searchLeave = asyncHandler(async(req, res) => {
                             foreignField: "_id",
                             as: "concern"
                         }
-                    },
-                    {
+                    },{
                         $lookup: {
                             from: "departments", 
                             localField: "departmentId",
                             foreignField: "_id",
                             as: "department"
                         }
-                    },
-                    {
+                    },{
                         $lookup: {
                             from: "users", 
                             localField: "employeeId",
                             foreignField: "_id",
                             as: "user"
                         }
-                    },
-                    {
+                    },{
                         $match: {
                             $or: [
                                 { 'concern.name': searchQuery },
@@ -65,11 +64,8 @@ const searchLeave = asyncHandler(async(req, res) => {
                         }
                     }
                 ]);
-
             }else{
                 //@brach-hr
-                //console.log(req.account);
-
                 leaves = await Leave.aggregate([
                     {
                         $lookup: {
@@ -90,7 +86,7 @@ const searchLeave = asyncHandler(async(req, res) => {
                     {
                         $match: {
                             $and: [
-                                { concernId : new ObjectId(concernId) },
+                                { concernId : new ObjectId( req.account.concernId ) },
                                 { 
                                     $or: [
                                         { 'department.name': searchQuery },
@@ -103,9 +99,7 @@ const searchLeave = asyncHandler(async(req, res) => {
                     }
                 ]);
             }
-
             res.status(200).json({ message : `${leaves.length} result found !`, data : leaves });
-
         }
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -119,19 +113,21 @@ const allLeave = asyncHandler(async(req, res) => {
     
     try{
 
-        let concernId = undefined;
+        let role = "hr"; 
 
-        //@after giving the role then use it as concernId
-        //concernId = req.account.concernId;
+        //console.log(req.account)
+        
+        //@after giving route protection 
+        //role = req.account.role;
 
         let leaves;
-
-        if(!concernId){
+        
+        if(role === "hr"){
             //@hr
             leaves = Leave.find({ });
         }else{
             //@brach-hr
-            leaves = Leave.find({ concernId });
+            leaves = Leave.find({ concernId : req.account.concernId });
         }
 
         leaves = leaves.populate({ path : 'concernId departmentId employeeId', 
