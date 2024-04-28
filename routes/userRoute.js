@@ -14,7 +14,7 @@ const upload = multer({
 router
     .route("/")
     //@api/users?page=&limit=&sort=
-    .get(userController.allUsers)
+    .get(accountValidation.isLogin,userController.allUsers)
     //@api/users
     .post(upload.single("imagePath"), userController.createUser)
     //@api/users?id=<user_id>
@@ -44,6 +44,6 @@ router
 router
     .route("/search/:clue")
     //@api/users/search/
-    .get(userController.searchUser)
+    .get(accountValidation.isLogin,userController.searchUser)
 
 module.exports = router;

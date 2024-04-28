@@ -1,6 +1,7 @@
 //@external module
 const asyncHandler = require("express-async-handler");
 const { isValidObjectId } = require("mongoose");
+const { ObjectId } = require('mongodb');
 
 //@internal module
 const { User, 
@@ -20,8 +21,6 @@ const loginUser = asyncHandler(async (req, res) => {
 
         const { email, password } = req.body;
 
-        console.log(req.body)
-
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))){
@@ -35,7 +34,6 @@ const loginUser = asyncHandler(async (req, res) => {
         } else {
             res.status(401).json({ message:"Invalid email or password"});
         }
-
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -48,20 +46,22 @@ const allUsers = asyncHandler(async(req, res) => {
 
     try {
 
-        let concernId = undefined;
+        let role = "hr"; 
 
-        //@after giving the role then use it as concernId
-        //concernId = req.account.concernId;
+        //console.log(req.account)
+        
+        //@after giving route protection 
+        //role = req.account.role;
 
         let users;
         
-        if(!concernId){
+        if(role === "hr"){
             //@hr
-            users = User.find({});
+            users = User.find({ });
         }
         else{
             //@branch-hr
-            users = User.find({ concernId });
+            users = User.find({ concernId : req.account.concernId });
         }
 
         users = users.populate({ path : 'concernId departmentId', select : ['name', 'name']});
@@ -291,27 +291,87 @@ const searchUser = asyncHandler( async(req, res) => {
 
     try {
         
-        const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
-        const mobile = new RegExp( "^" + escapeString( req.params.clue ), "i" );
-
         if( req.params.clue !== ""){
 
-            const users = await User.find({
+            const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
+            const  strictQuery = new RegExp( "^" + escapeString( req.params.clue ), "i" );
 
-                $or : [
-                    { name : searchQuery },
-                    { designation : searchQuery },
-                    { mobile }
-                ]
-            });
+            let role = "hr"; 
 
+            //console.log(req.account);
+        
+            //@after giving route protection 
+            //role = req.account.role;
+
+            let users;
+
+            if(role === "hr"){
+                //@hr
+                users = await User.aggregate([
+                    {
+                        $lookup: {
+                            from: "concerns", 
+                            localField: "concernId",
+                            foreignField: "_id",
+                            as: "concern"
+                        }
+                    },{
+                        $lookup: {
+                            from: "departments", 
+                            localField: "departmentId",
+                            foreignField: "_id",
+                            as: "department"
+                        }
+                    },{
+                        $match: {
+                            $or: [
+                                { 'concern.name': searchQuery },
+                                { 'department.name': searchQuery },
+                                { name : searchQuery },
+                                { role : searchQuery },
+                                { designation : searchQuery },
+                                { officeId: strictQuery },
+                                { mobile : strictQuery },
+                                { email : strictQuery }
+                            ]
+                        }
+                    }
+                ]);
+            }else{
+                //@branch-hr
+                users = await User.aggregate([
+                    {
+                        $lookup: {
+                            from: "departments", 
+                            localField: "departmentId",
+                            foreignField: "_id",
+                            as: "department"
+                        }
+                    },{
+                        $match: {
+                            $and:[
+                                { concernId : new ObjectId( req.account.concernId )},
+                                {
+                                    $or: [
+                                        { 'department.name': searchQuery },
+                                        { name : searchQuery },
+                                        { role : searchQuery },
+                                        { designation : searchQuery },
+                                        { officeId: strictQuery },
+                                        { mobile : strictQuery },
+                                        { email : strictQuery }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]);
+            }
             res.status(200).json({ message : `${users.length} result found !`, data : users });
         }
-
     } catch (error) {
         res.status(400).json({ message : error.message });        
     }
-
 });
 
 //@exports
