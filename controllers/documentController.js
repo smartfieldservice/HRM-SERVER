@@ -7,7 +7,7 @@ const { isValidObjectId } = require("mongoose");
 const { Document } = require("../models/modelExporter");
 const { pagination, 
         generateSlug, 
-        escapeString} = require("../utils/common");
+        escapeString } = require("../utils/common");
 
 //@desc get all documents
 //@route Get /api/document?page=1&limit=3&sort=

@@ -1,6 +1,5 @@
 //@external module
 const asyncHandler = require("express-async-handler");
-const faker = require("faker");
 const { isValidObjectId } = require("mongoose");
 
 //@internal module
@@ -74,7 +73,6 @@ const allUsers = asyncHandler(async(req, res) => {
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
-
 });
 
 //@desc Create New User
@@ -314,29 +312,6 @@ const searchUser = asyncHandler( async(req, res) => {
         res.status(400).json({ message : error.message });        
     }
 
-});
-
-//@desc Generate Many new Users
-const generateUsers = asyncHandler(async (req, res) => {
-    let users = [];
-    for (let i = 0; i< 10; i +=1){
-        const name = faker.name.findName();
-
-        let newUser = {
-            name,
-            email: faker.internet.email(name),
-            password: "pass12345",
-            role: faker.random.arrayElement(["admin", "hrm", "employee"])
-        };
-        users.push(newUser);
-    }
-
-    try {
-        const createUsers = await User.insertMany(users);
-        res.json(createUsers);
-    }catch (error) {
-        res.json({ message: error });
-    }
 });
 
 //@exports

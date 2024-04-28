@@ -2,7 +2,7 @@
 const express = require('express');
 const path = require("path");
 const cors = require("cors");
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();
 const logger = require('morgan');
 
 //@internal module
@@ -14,8 +14,6 @@ const { userRoute,
         expenseRoute,
         documentRoute,
         dashboardRoute } = require("../routes/routeExporter");
-
-dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 module.exports = async(app) => {
 

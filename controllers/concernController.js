@@ -6,7 +6,7 @@ const { isValidObjectId } = require("mongoose");
 const { Concern } = require("../models/modelExporter");
 const { generateSlug, 
         pagination, 
-        escapeString} =require("../utils/common");
+        escapeString } =require("../utils/common");
 
 //@desc get all concern
 //route Get /api/concern?page=&limit=&sort=

@@ -39,21 +39,22 @@ const concernWiseDepartment = asyncHandler(async(req, res) => {
 //@access hr/branch-hr
 const allDepartment = asyncHandler(async(req, res) => {
     
-    try{   
+    try{
 
-        let concernId = undefined; 
+        let role = "hr"; 
         
-        //@after giving the role then use it as concernId
-        //concernId = req.account.concernId;
+        //@after giving route protection 
+        //role = req.account.role;
 
         let departments;
 
-        if(!concernId){
+        if(role === "hr"){
             //@hr
             departments = Department.find({ });
+
         }else{
             //@branch-hr
-            departments = Department.find({ concernId });
+            departments = Department.find({ concernId : req.account.concernId });
         }
         
         departments = departments.populate({ path : 'concernId', select : ['name']});
@@ -190,18 +191,18 @@ const searchDepartment = asyncHandler( async(req, res) => {
 
     try {
         
-        const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
-
         if( req.params.clue !== ""){
 
-            let concernId = undefined;
+            const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
 
-            //@after giving the role then use it as concernId
-            //concernId = req.account.concernId;
+            let role = "hr"; 
+        
+            //@after giving route protection 
+            //role = req.account.role;
 
             let departments;
 
-            if(!concernId){
+            if(role === "hr"){
                 //@hr
                 departments = await Department.aggregate([
                     {
@@ -221,28 +222,23 @@ const searchDepartment = asyncHandler( async(req, res) => {
                         }
                     }
                 ]);
-
             }else{
                 //@brach-hr
-                console.log(req.account);
 
                 departments = await Department.find({
                     $and : [
-                        { concernId : new ObjectId(concernId) },
+                        { concernId : new ObjectId( req.account.concernId ) },
                         { $or : [
                             { name : searchQuery }
                         ]}
                     ]
-                })
+                });
             }
-
             res.status(200).json({ message : `${departments.length} result found !`, data : departments });
         }
-
     } catch (error) {
         res.status(400).json({ message : error.message });        
     }
-
 });
 
 //@exports
