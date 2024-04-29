@@ -25,11 +25,11 @@ const totalInformation = asyncHandler( async(req, res) => {
             employees = await User.find({ });
             concerns = await Concern.find({ });
         }else{
-            //branch-hr
+            //@branch-hr
             departments = await Department.find({ concernId : req.account.concernId });
             employees = await User.find({ concernId : req.account.concernId });
         }
-        res.status(200).json({ concern : `${concerns.length} concerns found !`, department : `${departments.length} departments found !`, employee : `${employees.length} employees found !`});
+        res.status(200).json({ concern : `${concerns.length}`, department : `${departments.length}`, employee : `${employees.length}`});
 
     } catch (error) {
         res.status(404).json({ message: error});

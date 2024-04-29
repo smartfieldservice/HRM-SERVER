@@ -109,7 +109,7 @@ const createUser = asyncHandler(async (req, res) => {
                 password : hashPassword,
                 role,
                 concernId,
-                departmentId,
+                departmentId, 
                 imagePath : req.file.location
             });
 
