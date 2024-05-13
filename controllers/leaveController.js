@@ -20,16 +20,9 @@ const searchLeave = asyncHandler(async(req, res) => {
 
             const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
-            let role = "hr"; 
-
-            //console.log(req.account);
-        
-            //@after giving route protection 
-            //role = req.account.role;
-
             let leaves;
 
-            if(role === "hr"){
+            if(req.account.role === "hr"){
                 //@hr
                 leaves = await Leave.aggregate([
                     {
@@ -113,33 +106,42 @@ const allLeave = asyncHandler(async(req, res) => {
     
     try{
 
-        let role = "hr"; 
+        const { id, year, page, limit, sort} = req.query;
 
-        //console.log(req.account)
+        const queryObject = {};
         
-        //@after giving route protection 
-        //role = req.account.role;
-
-        let leaves;
-        
-        if(role === "hr"){
-            //@hr
-            leaves = Leave.find({ });
-        }else{
+        if(req.account.role === "branch-hr"){
             //@brach-hr
-            leaves = Leave.find({ concernId : req.account.concernId });
+            queryObject.concernId = req.account.concernId;
         }
 
-        leaves = leaves.populate({ path : 'concernId departmentId employeeId', 
+        if(id){
+            //@employeeId
+            queryObject.employeeId = id;
+        }
+
+        if(year){
+            //@year wise
+            let date = `${year}-${String(0 + 1).padStart(2, '0')}-${String(1).padStart(2, '0')}`;
+
+            queryObject.startdate = { $gte : date };
+
+            date = `${year}-${String(11 + 1).padStart(2, '0')}-${String(31).padStart(2, '0')}`;
+
+            queryObject.enddate = { $lte : date };
+
+        }
+
+        let leaves = Leave.find(queryObject).populate({ path : 'concernId departmentId employeeId', 
                                 select : 'name name name'});
 
         let sortBy = "-createdAt";
-        if(req.query.sort){
-            sortBy = req.query.sort.replace(","," ");
+        if(sort){
+            sortBy = sort.replace(","," ");
         }
-
         leaves = leaves.sort(sortBy);
-        leaves = await pagination(req.query.page, req.query.limit, leaves);
+
+        leaves = await pagination(page, limit, leaves);
 
         res.status(200).json({ message : `${leaves.length} leaves found`, data : leaves });
     
