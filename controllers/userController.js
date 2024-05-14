@@ -46,26 +46,31 @@ const allUsers = asyncHandler(async(req, res) => {
 
     try {
 
-        let users;
-        
-        if(req.account.role === "hr"){
-            //@hr
-            users = User.find({ });
-        }
-        else if(req.account.role === "branch-hr"){
-            //@branch-hr
-            users = User.find({ concernId : req.account.concernId });
-        }else{
-            //@general employee
-            res.status(400).json({ message : "Bad request"});
-        }
+        if (req.account && req.account.role) {
 
-        users = users.populate({ path : 'concernId departmentId', select : ['name', 'name']});
+            let users;
+        
+            if(req.account.role === "hr"){
+                //@hr
+                users = User.find({ });
+            }
+            else if(req.account.role === "branch-hr"){
+                //@branch-hr
+                users = User.find({ concernId : req.account.concernId });
+            }else{
+                //@general employee
+                res.status(400).json({ message : "Bad request"});
+            }
 
-        users = await pagination(req.query.page, req.query.limit, users);
-        
-        res.status(200).json({ message : `${users.length} users found`, data : users });
-        
+            users = users.populate({ path : 'concernId departmentId', select : ['name', 'name']});
+            users = await pagination(req.query.page, req.query.limit, users);
+            
+            res.status(200).json({ message : `${users.length} users found`, data : users });
+
+        } else {
+            //@unauthorized-person
+            return res.status(400).json({ message: "Bad request" });
+        }
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
@@ -263,8 +268,6 @@ const concernAndDepartmentWiseUser = asyncHandler(async(req, res) => {
         
         }else{
 
-            console.log("i am ")
-
             const users = await User.find({ 
                 $and : [
                     { concernId : req.query.c_id },
@@ -292,74 +295,82 @@ const searchUser = asyncHandler( async(req, res) => {
             const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
             const  strictQuery = new RegExp( "^" + escapeString( req.params.clue ), "i" );
             
-            let users;
+            if (req.account && req.account.role) {
+                
+                let users;
+                
+                if(req.account.role === "hr"){
+                    //@hr
+                    users = await User.aggregate([
+                        {
+                            $lookup: {
+                                from: "concerns", 
+                                localField: "concernId",
+                                foreignField: "_id",
+                                as: "concern"
+                            }
+                        },{
+                            $lookup: {
+                                from: "departments", 
+                                localField: "departmentId",
+                                foreignField: "_id",
+                                as: "department"
+                            }
+                        },{
+                            $match: {
+                                $or: [
+                                    { 'concern.name': searchQuery },
+                                    { 'department.name': searchQuery },
+                                    { name : searchQuery },
+                                    { role : searchQuery },
+                                    { designation : searchQuery },
+                                    { officeId: strictQuery },
+                                    { mobile : strictQuery },
+                                    { email : strictQuery }
+                                ]
+                            }
+                        }
+                    ]);
+                }else if(req.account.role === "branch-hr"){
+                    //@branch-hr
+                    users = await User.aggregate([
+                        {
+                            $lookup: {
+                                from: "departments", 
+                                localField: "departmentId",
+                                foreignField: "_id",
+                                as: "department"
+                            }
+                        },{
+                            $match: {
+                                $and:[
+                                    { concernId : new ObjectId( req.account.concernId )},
+                                    {
+                                        $or: [
+                                            { 'department.name': searchQuery },
+                                            { name : searchQuery },
+                                            { role : searchQuery },
+                                            { designation : searchQuery },
+                                            { officeId: strictQuery },
+                                            { mobile : strictQuery },
+                                            { email : strictQuery }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]);
+                }else{
+                    //@general employee
+                    res.status(400).json({ message : "Bad request"});
+                }
+
+                res.status(200).json({ message : `${users.length} result found !`, data : users });
             
-            if(req.account.role === "hr"){
-                //@hr
-                users = await User.aggregate([
-                    {
-                        $lookup: {
-                            from: "concerns", 
-                            localField: "concernId",
-                            foreignField: "_id",
-                            as: "concern"
-                        }
-                    },{
-                        $lookup: {
-                            from: "departments", 
-                            localField: "departmentId",
-                            foreignField: "_id",
-                            as: "department"
-                        }
-                    },{
-                        $match: {
-                            $or: [
-                                { 'concern.name': searchQuery },
-                                { 'department.name': searchQuery },
-                                { name : searchQuery },
-                                { role : searchQuery },
-                                { designation : searchQuery },
-                                { officeId: strictQuery },
-                                { mobile : strictQuery },
-                                { email : strictQuery }
-                            ]
-                        }
-                    }
-                ]);
-            }else if(req.account.role === "branch-hr"){
-                //@branch-hr
-                users = await User.aggregate([
-                    {
-                        $lookup: {
-                            from: "departments", 
-                            localField: "departmentId",
-                            foreignField: "_id",
-                            as: "department"
-                        }
-                    },{
-                        $match: {
-                            $and:[
-                                { concernId : new ObjectId( req.account.concernId )},
-                                {
-                                    $or: [
-                                        { 'department.name': searchQuery },
-                                        { name : searchQuery },
-                                        { role : searchQuery },
-                                        { designation : searchQuery },
-                                        { officeId: strictQuery },
-                                        { mobile : strictQuery },
-                                        { email : strictQuery }
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ]);
-            }else{
-                //@general employee
-                res.status(400).json({ message : "Bad request"});
+            }else {
+                //@unauthorized-person
+                return res.status(400).json({ message: "Bad request" });
             }
-            res.status(200).json({ message : `${users.length} result found !`, data : users });
         }
     } catch (error) {
         res.status(400).json({ message : error.message });        
