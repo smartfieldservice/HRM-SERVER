@@ -20,9 +20,9 @@ const searchLeave = asyncHandler(async(req, res) => {
 
             const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
-            let leaves;
-
             if (req.account && req.account.role) {
+
+                let leaves;
 
                 if (req.account.role === "hr") {
                     //@hr
