@@ -22,77 +22,88 @@ const searchLeave = asyncHandler(async(req, res) => {
 
             let leaves;
 
-            if(req.account.role === "hr"){
-                //@hr
-                leaves = await Leave.aggregate([
-                    {
-                        $lookup: {
-                            from: "concerns", 
-                            localField: "concernId",
-                            foreignField: "_id",
-                            as: "concern"
+            if (req.account && req.account.role) {
+
+                if (req.account.role === "hr") {
+                    //@hr
+                    leaves = await Leave.aggregate([
+                        {
+                            $lookup: {
+                                from: "concerns", 
+                                localField: "concernId",
+                                foreignField: "_id",
+                                as: "concern"
+                            }
+                        },{
+                            $lookup: {
+                                from: "departments", 
+                                localField: "departmentId",
+                                foreignField: "_id",
+                                as: "department"
+                            }
+                        },{
+                            $lookup: {
+                                from: "users", 
+                                localField: "employeeId",
+                                foreignField: "_id",
+                                as: "user"
+                            }
+                        },{
+                            $match: {
+                                $or: [
+                                    { 'concern.name': searchQuery },
+                                    { 'department.name': searchQuery },
+                                    { 'user.name': searchQuery },
+                                    { leavetype: searchQuery },
+                                ]
+                            }
                         }
-                    },{
-                        $lookup: {
-                            from: "departments", 
-                            localField: "departmentId",
-                            foreignField: "_id",
-                            as: "department"
+                    ]);
+                } else if (req.account.role === "branch-hr") {
+                    //@branch-hr
+                    leaves = await Leave.aggregate([
+                        {
+                            $lookup: {
+                                from: "departments", 
+                                localField: "departmentId",
+                                foreignField: "_id",
+                                as: "department"
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "users", 
+                                localField: "employeeId",
+                                foreignField: "_id",
+                                as: "user"
+                            }
+                        },
+                        {
+                            $match: {
+                                $and: [
+                                    { concernId : new ObjectId( req.account.concernId ) },
+                                    { 
+                                        $or: [
+                                            { 'department.name': searchQuery },
+                                            { 'user.name': searchQuery },
+                                            { leavetype: searchQuery }
+                                        ]
+                                    }
+                                ]
+                            }
                         }
-                    },{
-                        $lookup: {
-                            from: "users", 
-                            localField: "employeeId",
-                            foreignField: "_id",
-                            as: "user"
-                        }
-                    },{
-                        $match: {
-                            $or: [
-                                { 'concern.name': searchQuery },
-                                { 'department.name': searchQuery },
-                                { 'user.name': searchQuery },
-                                { leavetype: searchQuery },
-                            ]
-                        }
-                    }
-                ]);
-            }else{
-                //@brach-hr
-                leaves = await Leave.aggregate([
-                    {
-                        $lookup: {
-                            from: "departments", 
-                            localField: "departmentId",
-                            foreignField: "_id",
-                            as: "department"
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "users", 
-                            localField: "employeeId",
-                            foreignField: "_id",
-                            as: "user"
-                        }
-                    },
-                    {
-                        $match: {
-                            $and: [
-                                { concernId : new ObjectId( req.account.concernId ) },
-                                { 
-                                    $or: [
-                                        { 'department.name': searchQuery },
-                                        { 'user.name': searchQuery },
-                                        { leavetype: searchQuery }
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ]);
+                    ]);
+                } else {
+                    //@employee
+                    return res.status(400).json({ message: "Bad request" });
+                }
+                
+                res.status(200).json({ message : `${leaves.length} result found !`, data : leaves });
+    
+            } else {
+                //@unauthorized-person
+                return res.status(400).json({ message: "Bad request" });
             }
-            res.status(200).json({ message : `${leaves.length} result found !`, data : leaves });
         }
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -109,12 +120,25 @@ const allLeave = asyncHandler(async(req, res) => {
         const { id, year, page, limit, sort} = req.query;
 
         const queryObject = {};
-        
-        if(req.account.role === "branch-hr"){
-            //@brach-hr
-            queryObject.concernId = req.account.concernId;
-        }
 
+        if (req.account && req.account.role) {
+
+            if (req.account.role === "hr") {
+                //@hr
+                queryObject.concernId;
+            } else if (req.account.role === "branch-hr") {
+                //@branch-hr
+                queryObject.concernId = req.account.concernId;
+            } else {
+                //@employee
+                return res.status(400).json({ message: "Bad request" });
+            }
+
+        } else {
+            //@unauthorized-person
+            return res.status(400).json({ message: "Bad request" });
+        }
+        
         if(id){
             //@employeeId
             queryObject.employeeId = id;
