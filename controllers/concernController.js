@@ -15,9 +15,9 @@ const allConcern = asyncHandler(async(req,res) => {
 
     try {
 
-        let concerns;
-
         if (req.account && req.account.role) {
+
+            let concerns;
 
             if (req.account.role === "hr") {
                 //@hr
@@ -31,26 +31,24 @@ const allConcern = asyncHandler(async(req,res) => {
                 //@employee
                 return res.status(400).json({ message: "Bad request" });
             }
+
+            let sortBy = "-createdAt";
+            if(req.query.sort){
+                sortBy = req.query.sort.replace(","," ");
+            }
+
+            concerns = concerns.sort(sortBy);
+            concerns = await pagination(req.query.page, req.query.limit, concerns);
+
+            res.status(200).json({ message : `${concerns.length} concerns found`, data : concerns });
+
         } else {
             //@unauthorized-person
             return res.status(400).json({ message: "Bad request" });
         }
-
-        let sortBy = "-createdAt";
-        if(req.query.sort){
-            sortBy = req.query.sort.replace(","," ");
-        }
-
-        concerns = concerns.sort(sortBy);
-
-        concerns = await pagination(req.query.page, req.query.limit, concerns);
-
-        res.status(200).json({ message : `${concerns.length} concerns found`, data : concerns });
-
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
-
 });
 
 //@desc create a new concern
@@ -170,11 +168,11 @@ const searchConcern = asyncHandler(async(req, res) => {
         
         if(req.params.clue !== ""){
 
-            const searchQuery = new RegExp( escapeString( req.params.clue), "i");
-            
-            let concerns;
-
             if (req.account && req.account.role) {
+
+                const searchQuery = new RegExp( escapeString( req.params.clue), "i");
+            
+                let concerns;
 
                 if (req.account.role === "hr") {
                     //@hr
@@ -185,13 +183,14 @@ const searchConcern = asyncHandler(async(req, res) => {
                             { address : searchQuery }
                         ]
                     });
-                }  
+                }
+
+                res.status(200).json({ message : `${concerns.length} result found !`, data : concerns });  
+            
             } else {
                 //@unauthorized-person
                 return res.status(400).json({ message: "Bad request" });
             }
-
-            res.status(200).json({ message : `${concerns.length} result found !`, data : concerns });
         }
     } catch (error) {
         res.status(400).json({ message : error.message });
