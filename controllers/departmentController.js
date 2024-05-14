@@ -47,9 +47,12 @@ const allDepartment = asyncHandler(async(req, res) => {
             //@hr
             departments = Department.find({ });
 
-        }else{
+        }else if(req.account.role === "branch-hr"){
             //@branch-hr
             departments = Department.find({ concernId : req.account.concernId });
+        }else{
+            //@general employee
+            res.status(400).json({ message : "Bad request"});
         }
         
         departments = departments.populate({ path : 'concernId', select : ['name']});
@@ -190,14 +193,9 @@ const searchDepartment = asyncHandler( async(req, res) => {
 
             const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
 
-            let role = "hr"; 
-        
-            //@after giving route protection 
-            //role = req.account.role;
-
             let departments;
 
-            if(role === "hr"){
+            if(req.account.role === "hr"){
                 //@hr
                 departments = await Department.aggregate([
                     {
@@ -217,7 +215,7 @@ const searchDepartment = asyncHandler( async(req, res) => {
                         }
                     }
                 ]);
-            }else{
+            }else if(req.account.role === "branch-hr"){
                 //@brach-hr
 
                 departments = await Department.find({
@@ -228,6 +226,9 @@ const searchDepartment = asyncHandler( async(req, res) => {
                         ]}
                     ]
                 });
+            }else{
+                //@general employee
+                res.status(400).json({ message : "Bad request"});
             }
             res.status(200).json({ message : `${departments.length} result found !`, data : departments });
         }
