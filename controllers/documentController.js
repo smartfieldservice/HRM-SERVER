@@ -15,17 +15,10 @@ const { pagination,
 const allDocument = asyncHandler(async(req, res) => {
     
     try {
-
-        let role = "hr"; 
-
-        //console.log(req.account);
         
-        //@after giving route protection 
-        //role = req.account.role;
-
         let documents;
 
-        if(role === "hr"){
+        if(req.account.role === "hr"){
             //@hr
             documents = Document.find({ }); 
         }else{

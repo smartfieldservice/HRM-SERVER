@@ -12,6 +12,9 @@ const upload = multer({
 });
 
 router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr', 'branch-hr']));
+
+router
     .route("/")
     //@api/document?page=1&limit=3&sort=
     .get(documentController.allDocument)
@@ -24,7 +27,7 @@ router
 router
     .route("/search/:clue")
     //@api/document/search/test
-    .get(/* accountValidation.isLogin, */documentController.searchDocument)
+    .get(documentController.searchDocument)
 
 //@exports
 module.exports = router;
