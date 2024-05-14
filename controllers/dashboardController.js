@@ -10,22 +10,16 @@ const totalInformation = asyncHandler( async(req, res) => {
 
     try {
 
-        let role = "hr"; 
-
-        //console.log(req.account);
-        
-        //@after giving route protection 
-        //role = req.account.role;
-
         let departments, employees, concerns;
 
-        if(role === "hr"){
+        if(req.account.role === "hr"){
             //@hr
             departments = await Department.find({ });
             employees = await User.find({ });
             concerns = await Concern.find({ });
         }else{
             //@branch-hr
+            concerns = await Concern.find({ _id : req.account.concernId });
             departments = await Department.find({ concernId : req.account.concernId });
             employees = await User.find({ concernId : req.account.concernId });
         }
