@@ -97,7 +97,7 @@ const searchLeave = asyncHandler(async(req, res) => {
                     //@employee
                     return res.status(400).json({ message: "Bad request" });
                 }
-                
+
                 res.status(200).json({ message : `${leaves.length} result found !`, data : leaves });
     
             } else {
@@ -117,11 +117,11 @@ const allLeave = asyncHandler(async(req, res) => {
     
     try{
 
-        const { id, year, page, limit, sort} = req.query;
-
-        const queryObject = {};
-
         if (req.account && req.account.role) {
+
+            const { id, year, page, limit, sort} = req.query;
+
+            const queryObject = {};
 
             if (req.account.role === "hr") {
                 //@hr
@@ -133,42 +133,41 @@ const allLeave = asyncHandler(async(req, res) => {
                 //@employee
                 return res.status(400).json({ message: "Bad request" });
             }
-
+            
+            if(id){
+                //@employeeId
+                queryObject.employeeId = id;
+            }
+    
+            if(year){
+                //@year wise
+                let date = `${year}-${String(0 + 1).padStart(2, '0')}-${String(1).padStart(2, '0')}`;
+    
+                queryObject.startdate = { $gte : date };
+    
+                date = `${year}-${String(11 + 1).padStart(2, '0')}-${String(31).padStart(2, '0')}`;
+    
+                queryObject.enddate = { $lte : date };
+    
+            }
+    
+            let leaves = Leave.find(queryObject).populate({ path : 'concernId departmentId employeeId', 
+                                    select : 'name name name'});
+    
+            let sortBy = "-createdAt";
+            if(sort){
+                sortBy = sort.replace(","," ");
+            }
+            leaves = leaves.sort(sortBy);
+    
+            leaves = await pagination(page, limit, leaves);
+    
+            res.status(200).json({ message : `${leaves.length} leaves found`, data : leaves });
+        
         } else {
             //@unauthorized-person
             return res.status(400).json({ message: "Bad request" });
         }
-        
-        if(id){
-            //@employeeId
-            queryObject.employeeId = id;
-        }
-
-        if(year){
-            //@year wise
-            let date = `${year}-${String(0 + 1).padStart(2, '0')}-${String(1).padStart(2, '0')}`;
-
-            queryObject.startdate = { $gte : date };
-
-            date = `${year}-${String(11 + 1).padStart(2, '0')}-${String(31).padStart(2, '0')}`;
-
-            queryObject.enddate = { $lte : date };
-
-        }
-
-        let leaves = Leave.find(queryObject).populate({ path : 'concernId departmentId employeeId', 
-                                select : 'name name name'});
-
-        let sortBy = "-createdAt";
-        if(sort){
-            sortBy = sort.replace(","," ");
-        }
-        leaves = leaves.sort(sortBy);
-
-        leaves = await pagination(page, limit, leaves);
-
-        res.status(200).json({ message : `${leaves.length} leaves found`, data : leaves });
-    
     }catch(error){
        res.status(400).json({ message : error.message });
     }

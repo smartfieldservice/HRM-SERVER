@@ -41,33 +41,38 @@ const allDepartment = asyncHandler(async(req, res) => {
     
     try{
 
-        let departments;
+        if (req.account && req.account.role) {
 
-        if(req.account.role === "hr"){
-            //@hr
-            departments = Department.find({ });
+            let departments;
 
-        }else if(req.account.role === "branch-hr"){
-            //@branch-hr
-            departments = Department.find({ concernId : req.account.concernId });
-        }else{
-            //@general employee
-            res.status(400).json({ message : "Bad request"});
-        }
+            if (req.account.role === "hr") {
+                //@hr
+                departments = Department.find({ });
+            } else if (req.account.role === "branch-hr") {
+                //@branch-hr
+                departments = Department.find({ concernId : req.account.concernId });
+            } else {
+                //@employee
+                return res.status(400).json({ message: "Bad request" });
+            }
+
+            departments = departments.populate({ path : 'concernId', select : ['name']});
         
-        departments = departments.populate({ path : 'concernId', select : ['name']});
-        
-        let sortBy = "-createdAt";
-        if(req.query.sort){
-            sortBy = req.query.sort.replace(","," ");
+            let sortBy = "-createdAt";
+            if(req.query.sort){
+                sortBy = req.query.sort.replace(","," ");
+            }
+
+            departments = departments.sort(sortBy);
+
+            departments = await pagination(req.query.page, req.query.limit, departments);
+
+            res.status(200).json({ message : `${departments.length} departments found`, data : departments });
+
+        } else {
+            //@unauthorized-person
+            return res.status(400).json({ message: "Bad request" });
         }
-
-        departments = departments.sort(sortBy);
-
-        departments = await pagination(req.query.page, req.query.limit, departments);
-
-        res.status(200).json({ message : `${departments.length} departments found`, data : departments });
-
     }catch(error){
         res.status(404).json({ message: error});
     }
@@ -104,7 +109,6 @@ const  createDepartment = asyncHandler(async (req, res) => {
             await department.save();
             res.status(200).json({ message : "Added successfully", department });
         }
-
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
@@ -146,10 +150,8 @@ const editDepartment = async(req, res) => {
                 });
 
                 res.status(200).json({message : "Edited Successfully !"});
-
             }
         }
-
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -195,42 +197,49 @@ const searchDepartment = asyncHandler( async(req, res) => {
 
             let departments;
 
-            if(req.account.role === "hr"){
-                //@hr
-                departments = await Department.aggregate([
-                    {
-                        $lookup: {
-                            from: "concerns", 
-                            localField: "concernId",
-                            foreignField: "_id",
-                            as: "concern"
-                        }
-                    },
-                    {
-                        $match: {
-                            $or: [
-                                { 'concern.name': searchQuery },
-                                { name: searchQuery }
-                            ]
-                        }
-                    }
-                ]);
-            }else if(req.account.role === "branch-hr"){
-                //@brach-hr
+            if (req.account && req.account.role) {
 
-                departments = await Department.find({
-                    $and : [
-                        { concernId : new ObjectId( req.account.concernId ) },
-                        { $or : [
-                            { name : searchQuery }
-                        ]}
-                    ]
-                });
-            }else{
-                //@general employee
-                res.status(400).json({ message : "Bad request"});
+                if (req.account.role === "hr") {
+                    //@hr
+                    departments = await Department.aggregate([
+                        {
+                            $lookup: {
+                                from: "concerns", 
+                                localField: "concernId",
+                                foreignField: "_id",
+                                as: "concern"
+                            }
+                        },
+                        {
+                            $match: {
+                                $or: [
+                                    { 'concern.name': searchQuery },
+                                    { name: searchQuery }
+                                ]
+                            }
+                        }
+                    ]);
+                } else if (req.account.role === "branch-hr") {
+                    //@branch-hr
+                    departments = await Department.find({
+                        $and : [
+                            { concernId : new ObjectId( req.account.concernId ) },
+                            { $or : [
+                                { name : searchQuery }
+                            ]}
+                        ]
+                    });
+                } else {
+                    //@employee
+                    return res.status(400).json({ message: "Bad request" });
+                }
+
+                res.status(200).json({ message : `${departments.length} result found !`, data : departments });
+    
+            } else {
+                //@unauthorized-person
+                return res.status(400).json({ message: "Bad request" });
             }
-            res.status(200).json({ message : `${departments.length} result found !`, data : departments });
         }
     } catch (error) {
         res.status(400).json({ message : error.message });        
