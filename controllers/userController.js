@@ -46,22 +46,18 @@ const allUsers = asyncHandler(async(req, res) => {
 
     try {
 
-        let role = "hr"; 
-
-        //console.log(req.account)
-        
-        //@after giving route protection 
-        //role = req.account.role;
-
         let users;
         
-        if(role === "hr"){
+        if(req.account.role === "hr"){
             //@hr
             users = User.find({ });
         }
-        else{
+        else if(req.account.role === "branch-hr"){
             //@branch-hr
             users = User.find({ concernId : req.account.concernId });
+        }else{
+            //@general employee
+            res.status(400).json({ message : "Bad request"});
         }
 
         users = users.populate({ path : 'concernId departmentId', select : ['name', 'name']});
@@ -295,17 +291,10 @@ const searchUser = asyncHandler( async(req, res) => {
 
             const  searchQuery = new RegExp( escapeString( req.params.clue ), "i" );
             const  strictQuery = new RegExp( "^" + escapeString( req.params.clue ), "i" );
-
-            let role = "hr"; 
-
-            //console.log(req.account);
-        
-            //@after giving route protection 
-            //role = req.account.role;
-
+            
             let users;
-
-            if(role === "hr"){
+            
+            if(req.account.role === "hr"){
                 //@hr
                 users = await User.aggregate([
                     {
@@ -337,7 +326,7 @@ const searchUser = asyncHandler( async(req, res) => {
                         }
                     }
                 ]);
-            }else{
+            }else if(req.account.role === "branch-hr"){
                 //@branch-hr
                 users = await User.aggregate([
                     {
@@ -366,6 +355,9 @@ const searchUser = asyncHandler( async(req, res) => {
                         }
                     }
                 ]);
+            }else{
+                //@general employee
+                res.status(400).json({ message : "Bad request"});
             }
             res.status(200).json({ message : `${users.length} result found !`, data : users });
         }

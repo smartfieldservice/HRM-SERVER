@@ -12,9 +12,17 @@ const upload = multer({
 });
 
 router
+    .route("/login")
+    //@api/users/login
+    .post(userController.loginUser)
+
+router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(["hr", "branch-hr"]));
+
+router
     .route("/")
     //@api/users?page=&limit=&sort=
-    .get(accountValidation.isLogin,userController.allUsers)
+    .get(userController.allUsers)
     //@api/users
     .post(upload.single("imagePath"), userController.createUser)
     //@api/users?id=<user_id>
@@ -22,14 +30,9 @@ router
     .delete(userController.deleteUser)
 
 router
-    .route("/login")
-    //@api/users/login
-    .post(userController.loginUser)
-
-router
     .route("/my-profile")
     //@api/users/my-profile
-    .get(accountValidation.isLogin,userController.ownProfile)
+    .get(userController.ownProfile)
 
 router
     .route("/profile")
@@ -44,6 +47,6 @@ router
 router
     .route("/search/:clue")
     //@api/users/search/
-    .get(accountValidation.isLogin,userController.searchUser)
+    .get(userController.searchUser)
 
 module.exports = router;
