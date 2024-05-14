@@ -10,21 +10,34 @@ const totalInformation = asyncHandler( async(req, res) => {
 
     try {
 
-        let departments, employees, concerns;
+        if (req.account && req.account.role) {
 
-        if(req.account.role === "hr"){
-            //@hr
-            departments = await Department.find({ });
-            employees = await User.find({ });
-            concerns = await Concern.find({ });
-        }else{
-            //@branch-hr
-            concerns = await Concern.find({ _id : req.account.concernId });
-            departments = await Department.find({ concernId : req.account.concernId });
-            employees = await User.find({ concernId : req.account.concernId });
+            let departments, employees, concerns;
+
+            if(req.account.role === "hr"){
+                //@hr
+                departments = await Department.find({ });
+                employees = await User.find({ });
+                concerns = await Concern.find({ });
+
+            }else if(req.account.role === "branch-hr"){
+                //@branch-hr
+                concerns = await Concern.find({ _id : req.account.concernId });
+                departments = await Department.find({ concernId : req.account.concernId });
+                employees = await User.find({ concernId : req.account.concernId });
+            
+            }else{
+               //@employee
+               return res.status(400).json({ message: "Bad request" });
+            }
+
+            res.status(200).json({ concern : `${concerns.length}`, department : `${departments.length}`, employee : `${employees.length}`});
+            
+        } else {
+            //@unauthorized-person
+            return res.status(400).json({ message: "Bad request" });
         }
-        res.status(200).json({ concern : `${concerns.length}`, department : `${departments.length}`, employee : `${employees.length}`});
-
+        
     } catch (error) {
         res.status(404).json({ message: error});
     }
