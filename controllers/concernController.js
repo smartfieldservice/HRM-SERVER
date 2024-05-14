@@ -17,12 +17,23 @@ const allConcern = asyncHandler(async(req,res) => {
 
         let concerns;
 
-        if(req.account.role === "hr"){
-            //@hr
-            concerns = Concern.find({});
-        }else{
-            //@branch-hr
-            concerns = Concern.find({ _id : req.account.concernId });
+        if (req.account && req.account.role) {
+
+            if (req.account.role === "hr") {
+                //@hr
+                concerns = Concern.find({});
+
+            } else if (req.account.role === "branch-hr") {
+                //@branch-hr
+                concerns = Concern.find({ _id : req.account.concernId });
+
+            } else {
+                //@employee
+                return res.status(400).json({ message: "Bad request" });
+            }
+        } else {
+            //@unauthorized-person
+            return res.status(400).json({ message: "Bad request" });
         }
 
         let sortBy = "-createdAt";
@@ -157,21 +168,31 @@ const searchConcern = asyncHandler(async(req, res) => {
 
     try {
         
-        const searchQuery = new RegExp( escapeString( req.params.clue), "i");
-
         if(req.params.clue !== ""){
 
-            const concerns = await Concern.find({
+            const searchQuery = new RegExp( escapeString( req.params.clue), "i");
+            
+            let concerns;
 
-                $or : [
-                    { name : searchQuery },
-                    { address : searchQuery }
-                ]
-            });
+            if (req.account && req.account.role) {
+
+                if (req.account.role === "hr") {
+                    //@hr
+                    concerns = await Concern.find({
+
+                        $or : [
+                            { name : searchQuery },
+                            { address : searchQuery }
+                        ]
+                    });
+                }  
+            } else {
+                //@unauthorized-person
+                return res.status(400).json({ message: "Bad request" });
+            }
 
             res.status(200).json({ message : `${concerns.length} result found !`, data : concerns });
         }
-
     } catch (error) {
         res.status(400).json({ message : error.message });
     }
