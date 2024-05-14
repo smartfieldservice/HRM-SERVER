@@ -11,13 +11,16 @@ const upload = multer({
     storage : s3Handler.storageConfig
 });
 
-/* router
-    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr'])); */
-
 router
     .route("/")
     //@api/concern?page=&limit=&sort=
-    .get(concernController.allConcern)
+    .get(accountValidation.isLogin,accountValidation.requiredRole(["hr", "branch-hr" ]),concernController.allConcern);
+
+router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(['hr']));
+
+router
+    .route("/")
     //@api/concern
     .post(upload.single('logo'), concernController.createConcern)
     //@api/concern?id=<concern_id>

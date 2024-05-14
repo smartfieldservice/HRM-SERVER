@@ -15,18 +15,24 @@ const allConcern = asyncHandler(async(req,res) => {
 
     try {
 
-        const { page, limit, sort} = req.query;
+        let concerns;
 
-        let concerns = Concern.find({});
+        if(req.account.role === "hr"){
+            //@hr
+            concerns = Concern.find({});
+        }else{
+            //@branch-hr
+            concerns = Concern.find({ _id : req.account.concernId });
+        }
 
         let sortBy = "-createdAt";
-        if(sort){
-            sortBy = sort.replace(","," ");
+        if(req.query.sort){
+            sortBy = req.query.sort.replace(","," ");
         }
 
         concerns = concerns.sort(sortBy);
 
-        concerns = await pagination(page, limit, concerns);
+        concerns = await pagination(req.query.page, req.query.limit, concerns);
 
         res.status(200).json({ message : `${concerns.length} concerns found`, data : concerns });
 
