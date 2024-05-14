@@ -7,6 +7,10 @@ const { accountValidation } = require("../middlewares/middlwareExporter");
 /* router
     .use(accountValidation.isLogin,accountValidation.requiredRole(['hr','branch-hr']))
  */
+
+router
+    .use(accountValidation.isLogin, accountValidation.requiredRole(["hr", "branch-hr"]));
+
 router
     .route("/concern/")
     //@api/department/concern?id=<concern_id>
@@ -15,7 +19,7 @@ router
 router
     .route("/")
     //@api/department?page=&limit=&sort=
-    .get(accountValidation.isLogin,departmentController.allDepartment)
+    .get(departmentController.allDepartment)
     //@api/department
     .post(departmentController.createDepartment)
     //@api/department?id=<department_id>
@@ -25,6 +29,6 @@ router
 router
     .route("/search/:clue")
     //@api/department/search/ma
-    .get(accountValidation.isLogin,departmentController.searchDepartment)
+    .get(departmentController.searchDepartment)
     
 module.exports = router;

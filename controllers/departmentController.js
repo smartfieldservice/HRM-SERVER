@@ -41,14 +41,9 @@ const allDepartment = asyncHandler(async(req, res) => {
     
     try{
 
-        let role = "hr"; 
-        
-        //@after giving route protection 
-        //role = req.account.role;
-
         let departments;
 
-        if(role === "hr"){
+        if(req.account.role === "hr"){
             //@hr
             departments = Department.find({ });
 
