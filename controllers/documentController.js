@@ -15,31 +15,40 @@ const { pagination,
 const allDocument = asyncHandler(async(req, res) => {
     
     try {
-        
-        let documents;
 
-        if(req.account.role === "hr"){
-            //@hr
-            documents = Document.find({ }); 
-        }else{
-            //@branch-hr
-            documents = Document.find({ concernId: req.account.concernId });
-        }
+        if (req.account && req.account.role) {
 
-        documents = documents.populate({path:'concernId departmentId' , select:'name name'});
+            let documents;
 
-        let sortBy = "-createdAt";
-        if(req.query.sort){
-            sortBy = req.query.sort.replace(","," ");
-        }
+            if(req.account.role === "hr"){
+                //@hr
+                documents = Document.find({ });
 
-        documents = documents.sort(sortBy);
+            }else if(req.account.role === "branch-hr"){
+                //@branch-hr
+                documents = Document.find({ concernId: req.account.concernId });
 
+            }else{
+               //@employee
+               return res.status(400).json({ message: "Bad request" });
+            }
 
-        documents = await pagination(req.query.page, req.query.limit, documents);
-        
-        res.status(200).json({message : `${documents.length} document's found !`,documents });
+            documents = documents.populate({ path:'concernId departmentId' , select:'name name' });
+
+            let sortBy = "-createdAt";
+            if(req.query.sort){
+                sortBy = req.query.sort.replace(","," ");
+            }
+
+            documents = documents.sort(sortBy);
+            documents = await pagination(req.query.page, req.query.limit, documents);
+            
+            res.status(200).json({message : `${documents.length} document's found !`,documents });
     
+        } else {
+            //@unauthorized-person
+            return res.status(400).json({ message: "Bad request" });
+        }
     } catch (error) {
         res.status(400).json(error.message);
     }
@@ -161,75 +170,86 @@ const searchDocument = asyncHandler(async(req, res) => {
 
             const searchQuery = new RegExp( escapeString(req.params.clue), "i");
 
-            let role = "hr"; 
+            if (req.account && req.account.role) {
 
-            //console.log(req.account);
+                let documents;
+    
+                if(req.account.role === "hr"){
+                    //@hr
+                    documents = await Document.aggregate([
+                        {
+                            $lookup: {
+                                from: "concerns", 
+                                localField: "concernId",
+                                foreignField: "_id",
+                                as: "concern"
+                            }
+                        },{
+                            $lookup: {
+                                from: "departments", 
+                                localField: "departmentId",
+                                foreignField: "_id",
+                                as: "department"
+                            }
+                        },{
+                            $match:{
+                                $or:[
+                                    { 'concern.name': searchQuery },
+                                    { 'department.name': searchQuery },
+                                    { title: searchQuery },
+                                ]
+                            }
+                        }
+                    ]);
+                }else if(req.account.role === "branch-hr"){
+                    //@branch-hr
+                    documents = await Document.aggregate([
+                        {
+                            $lookup: {
+                                from: "departments", 
+                                localField: "departmentId",
+                                foreignField: "_id",
+                                as: "department"
+                            }
+                        },{
+                            $match:{
+                                $and: [
+                                    { concernId : new ObjectId( req.account.concernId ) },
+                                    {
+                                        $or: [
+                                            { 'department.name': searchQuery },
+                                            { title: searchQuery },
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]);
+                }else{
+                   //@employee
+                   return res.status(400).json({ message: "Bad request" });
+                }
+
+                documents = documents.populate({ path:'concernId departmentId' , select:'name name' });
+    
+                let sortBy = "-createdAt";
+                if(req.query.sort){
+                    sortBy = req.query.sort.replace(","," ");
+                }
+    
+                documents = documents.sort(sortBy);
+                documents = await pagination(req.query.page, req.query.limit, documents);
+                
+                res.status(200).json({message : `${documents.length} document's found !`,documents });
         
-            //@after giving route protection 
-            //role = req.account.role;
-
-            let documents;
-
-            if(role === "hr"){
-                //@hr
-                documents = await Document.aggregate([
-                    {
-                        $lookup: {
-                            from: "concerns", 
-                            localField: "concernId",
-                            foreignField: "_id",
-                            as: "concern"
-                        }
-                    },{
-                        $lookup: {
-                            from: "departments", 
-                            localField: "departmentId",
-                            foreignField: "_id",
-                            as: "department"
-                        }
-                    },{
-                        $match:{
-                            $or:[
-                                { 'concern.name': searchQuery },
-                                { 'department.name': searchQuery },
-                                { title: searchQuery },
-                            ]
-                        }
-                    }
-                ]);
-            }else{
-                //@brach-hr
-                documents = await Document.aggregate([
-                    {
-                        $lookup: {
-                            from: "departments", 
-                            localField: "departmentId",
-                            foreignField: "_id",
-                            as: "department"
-                        }
-                    },{
-                        $match:{
-                            $and: [
-                                { concernId : new ObjectId( req.account.concernId ) },
-                                {
-                                    $or: [
-                                        { 'department.name': searchQuery },
-                                        { title: searchQuery },
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ]);
+            } else {
+                //@unauthorized-person
+                return res.status(400).json({ message: "Bad request" });
             }
-
-            res.status(200).json({ message : `${documents.length} result found !`, data : documents });
-
         }
     } catch (error) {
         res.status(400).json(error.message);
     }
-
 });
 
 //exports
