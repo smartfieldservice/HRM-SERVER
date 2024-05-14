@@ -229,18 +229,8 @@ const searchDocument = asyncHandler(async(req, res) => {
                    //@employee
                    return res.status(400).json({ message: "Bad request" });
                 }
-
-                documents = documents.populate({ path:'concernId departmentId' , select:'name name' });
-    
-                let sortBy = "-createdAt";
-                if(req.query.sort){
-                    sortBy = req.query.sort.replace(","," ");
-                }
-    
-                documents = documents.sort(sortBy);
-                documents = await pagination(req.query.page, req.query.limit, documents);
                 
-                res.status(200).json({message : `${documents.length} document's found !`,documents });
+                res.status(200).json({message : `${documents.length} result found !`,documents });
         
             } else {
                 //@unauthorized-person
