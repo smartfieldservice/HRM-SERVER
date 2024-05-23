@@ -5,7 +5,8 @@ const multer = require('multer');
 //@internal module
 const { userController } = require("../controllers/controllerExporter");
 const { s3Handler, 
-        accountValidation } = require("../middlewares/middlwareExporter");
+        accountValidation, 
+        userInputValidator} = require("../middlewares/middlwareExporter");
 
 const upload = multer({
     storage : s3Handler.storageConfig
@@ -14,7 +15,8 @@ const upload = multer({
 router
     .route("/login")
     //@api/users/login
-    .post(userController.loginUser)
+    .post(accountValidation.isLogout, userInputValidator.userLoginRules,
+            userInputValidator.validate, userController.loginUser)
 
 router
     .use(accountValidation.isLogin, accountValidation.requiredRole(["hr", "branch-hr"]));
@@ -24,7 +26,8 @@ router
     //@api/users?page=&limit=&sort=
     .get(userController.allUsers)
     //@api/users
-    .post(upload.single("imagePath"), userController.createUser)
+    .post(upload.single("imagePath"), userInputValidator.userInputRules, 
+                userInputValidator.validate, userController.createUser)
     //@api/users?id=<user_id>
     .put(userController.editUser)
     .delete(userController.deleteUser)

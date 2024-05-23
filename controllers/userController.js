@@ -23,7 +23,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
         const user = await User.findOne({ email });
 
-        if (user && (await user.matchPassword(password))){
+        if (user && (await user.matchPassword(password)) && user.role !== 'employee'){
             res.status(200).json({
                 _id: user._id,
                 name: user.name,
