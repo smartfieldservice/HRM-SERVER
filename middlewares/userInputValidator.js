@@ -5,8 +5,8 @@ const asyncHandler = require('express-async-handler');
 const userInputRules = [
     body('name', 'Name should be at least 6 characters long').notEmpty().isLength({ min: 6 }),
     body('email','Invalid Email').notEmpty().isEmail(),
-    body('mobile','Name should be minimum 6').notEmpty().matches(/^01[3-9]\d{8}$/),
-    body('emargencyMobile','Name should be minimum 6').notEmpty().matches(/^01[3-9]\d{8}$/),
+    body('mobile','Invalid BD Mobile Number').notEmpty().matches(/^01[3-9]\d{8}$/),
+    body('emargencyMobile','Invalid BD Mobile Number').notEmpty().matches(/^01[3-9]\d{8}$/),
     body('officeId','Office Id should not be empty').notEmpty(),
     body('designation','Designation should not be empty').notEmpty(),
     body('presentaddress','Present Address should not be empty').notEmpty(),
