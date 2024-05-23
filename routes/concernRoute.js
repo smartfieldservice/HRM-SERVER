@@ -5,7 +5,8 @@ const multer = require('multer');
 //@internal module
 const { concernController } = require("../controllers/controllerExporter");
 const { s3Handler, 
-        accountValidation } = require("../middlewares/middlwareExporter");
+        accountValidation, 
+        inputValidator} = require("../middlewares/middlwareExporter");
 
 const upload = multer({
     storage : s3Handler.storageConfig
@@ -22,7 +23,7 @@ router
 router
     .route("/")
     //@api/concern
-    .post(upload.single('logo'), concernController.createConcern)
+    .post(upload.single('logo'), inputValidator.concernInputRules, inputValidator.validate, concernController.createConcern)
     //@api/concern?id=<concern_id>
     .put(concernController.editConcern)
     .delete(concernController.deleteConcern)

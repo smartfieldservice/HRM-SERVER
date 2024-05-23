@@ -23,6 +23,12 @@ const userLoginRules = [
     body('email','Invalid Email').notEmpty().isEmail(),
 ]
 
+const concernInputRules = [
+    body('name', 'Concern name should be at least 6 characters long').notEmpty().isLength({ min: 6 }),
+    body('address', 'Address is too short').notEmpty().isLength({ min: 6 }),
+    body('description', 'Description is too short').notEmpty().isLength({ min: 6 }),
+]
+
 
 const validate = asyncHandler(async(req, res, next) => {
 
@@ -43,5 +49,6 @@ const validate = asyncHandler(async(req, res, next) => {
 //@exports
 module.exports = {  userInputRules,
                     userLoginRules,
+                    concernInputRules,
                     validate
                 }
