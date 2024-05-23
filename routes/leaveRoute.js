@@ -3,7 +3,7 @@ const router = require("express").Router();
 
 //@internal module
 const { leaveController } = require("../controllers/controllerExporter");
-const { accountValidation } = require("../middlewares/middlwareExporter");
+const { accountValidation, inputValidator } = require("../middlewares/middlwareExporter");
 
 router
     .use(accountValidation.isLogin, accountValidation.requiredRole(['hr', 'branch-hr']));
@@ -18,7 +18,7 @@ router
     //@api/leave?page=&limit=&sort=
     .get(leaveController.allLeave)
     //@api/leave
-    .post(leaveController.createLeave)
+    .post(inputValidator.leaveInputRules, inputValidator.validate, leaveController.createLeave)
     //@api/leave?id=<leave_id>
     .put(leaveController.editLeave)
     .delete(leaveController.deleteLeave)

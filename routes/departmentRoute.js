@@ -2,7 +2,8 @@
 const router = require("express").Router();
 
 const { departmentController } = require("../controllers/controllerExporter");
-const { accountValidation } = require("../middlewares/middlwareExporter");
+const { accountValidation, 
+        inputValidator } = require("../middlewares/middlwareExporter");
 
 /* router
     .use(accountValidation.isLogin,accountValidation.requiredRole(['hr','branch-hr']))
@@ -21,7 +22,7 @@ router
     //@api/department?page=&limit=&sort=
     .get(departmentController.allDepartment)
     //@api/department
-    .post(departmentController.createDepartment)
+    .post(inputValidator.departmentInputRules, inputValidator.validate, departmentController.createDepartment)
     //@api/department?id=<department_id>
     .put(departmentController.editDepartment)
     .delete(departmentController.deleteDepartment)

@@ -29,6 +29,20 @@ const concernInputRules = [
     body('description', 'Description is too short').notEmpty().isLength({ min: 6 }),
 ]
 
+const departmentInputRules = [
+    body('concernId','Concern should not be empty').notEmpty(),
+    body('name', 'Concern name should be at least 6 characters long').notEmpty().isLength({ min: 6 }),
+    body('description', 'Description is too short').notEmpty().isLength({ min: 6 }),
+]
+
+const leaveInputRules = [
+    body('concernId','Concern should not be empty').notEmpty(),
+    body('departmentId','Department should not be empty').notEmpty(),
+    body('employeeId','Employee should not be empty').notEmpty(),
+    body('duration','Duration should not be empty').notEmpty(),
+    body('leavetype','Leave Type should not be empty').notEmpty(),
+    body('description','Description should not be empty').notEmpty(),
+]
 
 const validate = asyncHandler(async(req, res, next) => {
 
@@ -50,5 +64,7 @@ const validate = asyncHandler(async(req, res, next) => {
 module.exports = {  userInputRules,
                     userLoginRules,
                     concernInputRules,
+                    departmentInputRules,
+                    leaveInputRules,
                     validate
                 }
