@@ -1,6 +1,6 @@
 //@external module
 const asyncHandler = require("express-async-handler");
-const { isValidObjectId } = require("mongoose");
+const { isValidObjectId, mongoose } = require("mongoose");
 const { ObjectId } = require('mongodb');
 
 //@internal module
@@ -410,6 +410,60 @@ const searchUser = asyncHandler( async(req, res) => {
     }
 });
 
+//@desc search users
+//@route Get /api/users/search/:clue?
+//@access hr/branch-hr
+const allUsersWithSearch = asyncHandler(async (req, res) => {
+    
+    try {
+
+        const { role, concernId } = req.account;
+        let users;
+
+        if (role === "hr") {
+            users = User.find({});
+        } else if (role === "branch-hr") {
+            users = User.find({ concernId: concernId });
+        } else {
+            return res.status(400).json({ message: "Bad request" });
+        }
+
+        if (req.params.clue) {
+
+            const searchQuery = new RegExp(escapeString(req.params.clue), "i");
+            const strictQuery = new RegExp("^" + escapeString(req.params.clue), "i");
+
+            users = await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] })
+                                .find({
+                                    $or: [
+                                        { 'concernId.name': searchQuery },
+                                        { 'departmentId.name': searchQuery },
+                                        { 'name': searchQuery },
+                                        { 'role': searchQuery },
+                                        { 'designation': searchQuery },
+                                        { 'officeId': strictQuery },
+                                        { 'mobile': strictQuery },
+                                        { 'email': strictQuery }
+                                    ]
+                                });
+        } else {
+            users = await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] });
+        }
+
+        //@pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const skip = (page - 1) * limit;
+
+        users = users.slice(skip, skip + limit);
+
+        res.status(200).json({ message: `${users.length} users found`, data: users });
+    
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 //@exports
 module.exports = {  loginUser,
                     allUsers,
@@ -419,5 +473,6 @@ module.exports = {  loginUser,
                     ownProfile,
                     otherProfile,
                     concernAndDepartmentWiseUser,
-                    searchUser
+                    searchUser,
+                    allUsersWithSearch
                 }

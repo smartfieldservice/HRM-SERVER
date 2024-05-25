@@ -48,8 +48,9 @@ router
     .get(userController.concernAndDepartmentWiseUser)
 
 router
-    .route("/search/:clue")
+    .route("/search/:clue?")
     //@api/users/search/
-    .get(userController.searchUser)
+    .get(userController.allUsersWithSearch)
+
 
 module.exports = router;
