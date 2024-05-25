@@ -247,7 +247,7 @@ const otherProfile = asyncHandler(async(req, res) => {
                 queryObject.employeeId = req.query.id;
 
                 //@default current year
-                const year = new Date().getFullYear();
+                const year = req.query.year || new Date().getFullYear();
 
                 //@view only current year leaves
                 queryObject.startdate = { $gte : startYear(year) };
@@ -267,8 +267,8 @@ const otherProfile = asyncHandler(async(req, res) => {
 
                 //@for total due of employee
                 const totalDues = {
-                    "casualDue" : 0,
-                    "sickDue" : 0
+                    "sickDue" : 0,
+                    "casualDue" : 0
                 }
                 if(totalLeaves){
 
