@@ -244,7 +244,7 @@ const otherProfile = asyncHandler(async(req, res) => {
                 const allLeaves = await Leave.find({ employeeId : req.query.id });
 
                 //@for total leave sum of this employee
-                const totalLeaves = await TotalLeaveOfUser.find({ employeeId : req.query.id });
+                const totalLeaves = await TotalLeaveOfUser.findOne({ employeeId : req.query.id });
                 
                 res.status(200).json({ message: "User found", data : user , allLeaves ,  totalLeaves });
             }
