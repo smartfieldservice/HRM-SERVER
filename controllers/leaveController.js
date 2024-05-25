@@ -6,7 +6,9 @@ const { ObjectId } = require('mongodb');
 const { Leave, 
         TotalLeaveOfUser } = require('../models/modelExporter');
 const { escapeString, 
-        pagination } = require('../utils/common');
+        pagination, 
+        startYear,
+        endYear} = require('../utils/common');
 const { isValidObjectId } = require('mongoose');
 
 //@desc display all Leave
@@ -141,14 +143,8 @@ const allLeave = asyncHandler(async(req, res) => {
     
             if(year){
                 //@year wise
-                let date = `${year}-${String(0 + 1).padStart(2, '0')}-${String(1).padStart(2, '0')}`;
-    
-                queryObject.startdate = { $gte : date };
-    
-                date = `${year}-${String(11 + 1).padStart(2, '0')}-${String(31).padStart(2, '0')}`;
-    
-                queryObject.enddate = { $lte : date };
-    
+                queryObject.startdate = { $gte : startYear(year) };
+                queryObject.enddate = { $lte : endYear(year) };
             }
     
             let leaves = Leave.find(queryObject).populate({ path : 'concernId departmentId employeeId', 
