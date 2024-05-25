@@ -7,6 +7,10 @@ const TotalLeaveOfUserSchema = mongoose.Schema(
             ref : "user",
             required: true 
         },
+        year : {
+            type : String,
+            required : true
+        },
         totalSick : {
             type : Number,
             default : 0

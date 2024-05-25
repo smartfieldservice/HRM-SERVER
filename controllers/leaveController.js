@@ -195,12 +195,19 @@ const createLeave = asyncHandler(async (req, res) => {
             description
         });
 
-        const employeeLeave = await TotalLeaveOfUser.findOne({ employeeId });
+        //@extract year
+        const year = startdate.split("-")[0];
+
+        const employeeLeave = await TotalLeaveOfUser.findOne({ 
+            $and : [
+                { employeeId },
+                { year }
+            ]
+        });
 
         let addLeaveToEmployee;
 
         if(employeeLeave){ 
-
             //@since employee already exist, so just update it
             addLeaveToEmployee = await TotalLeaveOfUser.findOneAndUpdate({
                     employeeId
@@ -214,10 +221,10 @@ const createLeave = asyncHandler(async (req, res) => {
             });
 
         }else{
-
             //@since employee not exist, so add a new record
             addLeaveToEmployee = await TotalLeaveOfUser.create({
                 employeeId,
+                year,
                 totalSick: leavetype === 'sick' ? totaldays : 0,
                 totalCasual: leavetype === 'casual' ? totaldays : 0
             });
@@ -247,20 +254,8 @@ const editLeave = asyncHandler(async(req, res) => {
             if(!leave){
                 res.status(404).json({ message : "Not found" });
             }else{
-                const { duration, leavetype, startdate, enddate, totaldays, description } = req.body;
                 
-                await Leave.findByIdAndUpdate({
-                    _id : req.query.id 
-                },{
-                    duration,
-                    leavetype,
-                    startdate,
-                    enddate,
-                    totaldays,
-                    description
-                },{
-                    new : true
-                });
+                //... build logic
                 
                 res.status(200).json({ message : "Edited successfully" });
             }
