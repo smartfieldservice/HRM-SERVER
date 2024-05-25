@@ -6,11 +6,14 @@ const { ObjectId } = require('mongodb');
 //@internal module
 const { User, 
         Leave, 
-        TotalLeaveOfUser } = require("../models/modelExporter");
+        TotalLeaveOfUser, 
+        LeavePerYear} = require("../models/modelExporter");
 const { pagination, 
         generateAuthToken, 
         escapeString, 
-        hashedPassword } = require("../utils/common");
+        hashedPassword,
+        startYear,
+        endYear } = require("../utils/common");
 
 //@desc Authorize user & get token during login
 //@route Post /api/users/login
@@ -240,13 +243,43 @@ const otherProfile = asyncHandler(async(req, res) => {
                 //@details of the user
                 user = await user;
 
-                //@for all leave of this employee
-                const allLeaves = await Leave.find({ employeeId : req.query.id });
+                const queryObject = {};
+                queryObject.employeeId = req.query.id;
 
-                //@for total leave sum of this employee
-                const totalLeaves = await TotalLeaveOfUser.findOne({ employeeId : req.query.id });
+                //@default current year
+                const year = new Date().getFullYear();
+
+                //@view only current year leaves
+                queryObject.startdate = { $gte : startYear(year) };
+
+                queryObject.enddate = { $lte : endYear(year) };
+
+                //@current year all leave of employee 
+                const allLeaves = await Leave.find( queryObject ).sort({ updatedAt : -1 });
+
+                //@current total leave of employee
+                const totalLeaves = await TotalLeaveOfUser.findOne({ 
+                    $and : [
+                        { employeeId : req.query.id },
+                        { year }
+                    ]
+                 });
+
+                //@for total due of employee
+                const totalDues = {
+                    "casualDue" : 0,
+                    "sickDue" : 0
+                }
+                if(totalLeaves){
+
+                    const leavePerYear = await LeavePerYear.findOne({ year });
+
+                    totalDues.casualDue = leavePerYear.casual - totalLeaves.totalCasual;
+                    totalDues.sickDue = leavePerYear.sick - totalLeaves.totalSick;
+
+                }
                 
-                res.status(200).json({ message: "User found", data : user , allLeaves ,  totalLeaves });
+                res.status(200).json({ message: "User found", data : user , allLeaves ,  totalLeaves, totalDues });
             }
         }
     } catch (error) {

@@ -61,6 +61,18 @@ const generateSlug = function(str){
     return str.toLowerCase().replace(/\s+/g, "-");
 };
 
+//@start date of a year like "2024-01-01"
+const startYear = function(year){
+    return `${year}-${String(0 + 1).padStart(2, '0')}-${String(1).padStart(2, '0')}`;
+}
+
+//@end date of a year like "2024-31-12"
+const endYear = function(year){
+    return `${year}-${String(11 + 1).padStart(2, '0')}-${String(31).padStart(2, '0')}`;
+}
+
+
+
 //@exports
 module.exports = {  escapeString,
                     pagination,
@@ -69,5 +81,7 @@ module.exports = {  escapeString,
                     generateAuthToken,
                     verifyAuthToken,
                     decodeAccount,
-                    generateSlug
+                    generateSlug,
+                    startYear,
+                    endYear
                 }
