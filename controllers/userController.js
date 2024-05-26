@@ -477,7 +477,17 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
                                     ]
                                 });
         } else {
-            users = await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] });
+
+            const queryObject = {};
+
+            if(req.query.concern){
+                queryObject.concernId = req.query.concern ;
+            }
+            if(req.query.department){
+                queryObject.departmentId = req.query.department ;
+            }
+
+            users = await users.find(queryObject).populate({ path: 'concernId departmentId', select: ['name', 'name'] });
         }
 
         //@pagination
