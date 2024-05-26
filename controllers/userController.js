@@ -430,46 +430,11 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
             const searchQuery = new RegExp(escapeString(req.params.clue), "i");
             const strictQuery = new RegExp("^" + escapeString(req.params.clue), "i");
 
-            /* users = await User.aggregate([
-                {
-                    $lookup: {
-                        from: "concerns", 
-                        localField: "concernId",
-                        foreignField: "_id",
-                        as: "concern"
-                    }
-                },{
-                    $lookup: {
-                        from: "departments", 
-                        localField: "departmentId",
-                        foreignField: "_id",
-                        as: "department"
-                    }
-                },{
-                    $match: {
-                        $or: [
-                            { 'concern.name': searchQuery },
-                            { 'department.name': searchQuery },
-                            { name : searchQuery },
-                            { role : searchQuery },
-                            { designation : strictQuery },
-                            { officeId: strictQuery },
-                            { mobile : strictQuery },
-                            { email : strictQuery }
-                        ]
-                    }
-                }
-            ]);
-
-            users =  await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] });
- */
             users = await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] })
                                 .find({
                                     $or: [
-                                        { 'concernId.name': searchQuery },
-                                        { 'departmentId.name': searchQuery },
                                         { 'name': searchQuery },
-                                        { 'role': searchQuery },
+                                        { 'role': strictQuery },
                                         { 'designation': searchQuery },
                                         { 'officeId': strictQuery },
                                         { 'mobile': strictQuery },
