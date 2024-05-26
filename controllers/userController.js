@@ -416,6 +416,7 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
 
         const { role, concernId } = req.account;
         let users;
+        const queryObject = {};
 
         if (role === "hr") {
             users = User.find({});
@@ -423,6 +424,17 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
             users = User.find({ concernId: concernId });
         } else {
             return res.status(400).json({ message: "Bad request" });
+        }
+
+        if(req.query.concern){
+            queryObject.concernId = req.query.concern ;
+        }
+        if(req.query.department){
+            queryObject.departmentId = req.query.department ;
+        }
+
+        if(queryObject){
+            users = users.find(queryObject);
         }
 
         if (req.params.clue) {
@@ -442,17 +454,7 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
                                     ]
                                 });
         } else {
-
-            const queryObject = {};
-
-            if(req.query.concern){
-                queryObject.concernId = req.query.concern ;
-            }
-            if(req.query.department){
-                queryObject.departmentId = req.query.department ;
-            }
-
-            users = await users.find(queryObject).populate({ path: 'concernId departmentId', select: ['name', 'name'] });
+            users = await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] });
         }
 
         //@pagination
