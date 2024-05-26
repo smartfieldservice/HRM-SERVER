@@ -7,21 +7,7 @@ const escapeString = function(str){
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"); 
 };
 
-//@function for pagination
-const pagination = async(pageNo, pageLimit, data) => {
-    
-    try {
-        const page = parseInt(pageNo) || 1;
-        const limit = parseInt(pageLimit);
-        const skip = (page -1) * limit;
-
-        return await data.skip(skip).limit(limit);
-
-    } catch (error) {
-        return error;
-    }
-}
-
+//@function for pagination using data as object
 const asyncPagination = async(pageNo, pageLimit, data) => {
     
     try {
@@ -36,6 +22,7 @@ const asyncPagination = async(pageNo, pageLimit, data) => {
     }
 }
 
+//@function for pagination using data as real data
 const syncPagination = function(pageNo, pageLimit, data) {
         
     const page = parseInt(pageNo) || 1;
@@ -97,7 +84,6 @@ const endYear = function(year){
 
 //@exports
 module.exports = {  escapeString,
-                    pagination,
                     asyncPagination,
                     syncPagination,
                     hashedPassword,
