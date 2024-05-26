@@ -4,7 +4,7 @@ const { isValidObjectId } = require('mongoose');
 
 //@internal module
 const { LeavePerYear } = require('../models/modelExporter');
-const { pagination } = require('../utils/common');
+const { asyncPagination } = require('../utils/common');
 
 // @desc display Leave-per-year
 // @route get /api/leave-per-year
@@ -24,7 +24,7 @@ const allLeavePerYear = asyncHandler(async(req, res) => {
 
         leavePerYear = leavePerYear.sort(sortBy);
 
-        leavePerYear = await pagination(page, limit, leavePerYear);
+        leavePerYear = await asyncPagination(page, limit, leavePerYear);
 
         res.status(200).json({ message : `${leavePerYear.length} data found !`, data : leavePerYear })
 

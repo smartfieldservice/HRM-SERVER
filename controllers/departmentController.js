@@ -6,7 +6,7 @@ const { ObjectId } = require('mongodb');
 //@internal module
 const { Department } = require('../models/modelExporter');
 const { generateSlug, 
-        pagination, 
+        asyncPagination, 
         escapeString} = require('../utils/common');
 
 //@desc get concern wise department
@@ -65,7 +65,7 @@ const allDepartment = asyncHandler(async(req, res) => {
 
             departments = departments.sort(sortBy);
 
-            departments = await pagination(req.query.page, req.query.limit, departments);
+            departments = await asyncPagination(req.query.page, req.query.limit, departments);
 
             res.status(200).json({ message : `${departments.length} departments found`, data : departments });
 

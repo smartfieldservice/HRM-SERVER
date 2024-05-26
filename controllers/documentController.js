@@ -5,7 +5,7 @@ const { isValidObjectId } = require("mongoose");
 
 //@internal module
 const { Document } = require("../models/modelExporter");
-const { pagination, 
+const { asyncPagination, 
         generateSlug, 
         escapeString } = require("../utils/common");
 
@@ -41,7 +41,7 @@ const allDocument = asyncHandler(async(req, res) => {
             }
 
             documents = documents.sort(sortBy);
-            documents = await pagination(req.query.page, req.query.limit, documents);
+            documents = await asyncPagination(req.query.page, req.query.limit, documents);
             
             res.status(200).json({message : `${documents.length} document's found !`,documents });
     

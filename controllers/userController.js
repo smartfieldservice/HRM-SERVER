@@ -7,13 +7,14 @@ const { ObjectId } = require('mongodb');
 const { User, 
         Leave, 
         TotalLeaveOfUser, 
-        LeavePerYear} = require("../models/modelExporter");
-const { pagination, 
+        LeavePerYear } = require("../models/modelExporter");
+const { asyncPagination, 
         generateAuthToken, 
         escapeString, 
         hashedPassword,
         startYear,
-        endYear } = require("../utils/common");
+        endYear, 
+        syncPagination } = require("../utils/common");
 
 //@desc Authorize user & get token during login
 //@route Post /api/users/login
@@ -66,7 +67,7 @@ const allUsers = asyncHandler(async(req, res) => {
             }
 
             users = users.populate({ path : 'concernId departmentId', select : ['name', 'name']});
-            users = await pagination(req.query.page, req.query.limit, users);
+            users = await asyncPagination(req.query.page, req.query.limit, users);
             
             res.status(200).json({ message : `${users.length} users found`, data : users });
 
@@ -251,7 +252,6 @@ const otherProfile = asyncHandler(async(req, res) => {
 
                 //@view only current year leaves
                 queryObject.startdate = { $gte : startYear(year) };
-
                 queryObject.enddate = { $lte : endYear(year) };
 
                 //@current year all leave of employee 
@@ -276,16 +276,13 @@ const otherProfile = asyncHandler(async(req, res) => {
 
                     totalDues.casualDue = leavePerYear.casual - totalLeaves.totalCasual;
                     totalDues.sickDue = leavePerYear.sick - totalLeaves.totalSick;
-
                 }
-                
                 res.status(200).json({ message: "User found", data : user , allLeaves ,  totalLeaves, totalDues });
             }
         }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-
 });
 
 //@desc get concern & department wise user
@@ -433,6 +430,39 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
             const searchQuery = new RegExp(escapeString(req.params.clue), "i");
             const strictQuery = new RegExp("^" + escapeString(req.params.clue), "i");
 
+            /* users = await User.aggregate([
+                {
+                    $lookup: {
+                        from: "concerns", 
+                        localField: "concernId",
+                        foreignField: "_id",
+                        as: "concern"
+                    }
+                },{
+                    $lookup: {
+                        from: "departments", 
+                        localField: "departmentId",
+                        foreignField: "_id",
+                        as: "department"
+                    }
+                },{
+                    $match: {
+                        $or: [
+                            { 'concern.name': searchQuery },
+                            { 'department.name': searchQuery },
+                            { name : searchQuery },
+                            { role : searchQuery },
+                            { designation : strictQuery },
+                            { officeId: strictQuery },
+                            { mobile : strictQuery },
+                            { email : strictQuery }
+                        ]
+                    }
+                }
+            ]);
+
+            users =  await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] });
+ */
             users = await users.populate({ path: 'concernId departmentId', select: ['name', 'name'] })
                                 .find({
                                     $or: [
@@ -451,11 +481,7 @@ const allUsersWithSearch = asyncHandler(async (req, res) => {
         }
 
         //@pagination
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 8;
-        const skip = (page - 1) * limit;
-
-        users = users.slice(skip, skip + limit);
+        users = syncPagination(req.query.page, req.query.limit, users)
 
         res.status(200).json({ message: `${users.length} users found`, data: users });
     

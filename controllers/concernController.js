@@ -5,7 +5,7 @@ const { isValidObjectId } = require("mongoose");
 //@internal module
 const { Concern } = require("../models/modelExporter");
 const { generateSlug, 
-        pagination, 
+        asyncPagination, 
         escapeString } =require("../utils/common");
 
 //@desc get all concern
@@ -38,7 +38,7 @@ const allConcern = asyncHandler(async(req,res) => {
             }
 
             concerns = concerns.sort(sortBy);
-            concerns = await pagination(req.query.page, req.query.limit, concerns);
+            concerns = await asyncPagination(req.query.page, req.query.limit, concerns);
 
             res.status(200).json({ message : `${concerns.length} concerns found`, data : concerns });
 

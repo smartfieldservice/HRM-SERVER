@@ -1,5 +1,4 @@
 //@external module
-const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -21,6 +20,29 @@ const pagination = async(pageNo, pageLimit, data) => {
     } catch (error) {
         return error;
     }
+}
+
+const asyncPagination = async(pageNo, pageLimit, data) => {
+    
+    try {
+        const page = parseInt(pageNo) || 1;
+        const limit = parseInt(pageLimit);
+        const skip = (page -1) * limit;
+
+        return await data.skip(skip).limit(limit);
+
+    } catch (error) {
+        return error;
+    }
+}
+
+const syncPagination = function(pageNo, pageLimit, data) {
+        
+    const page = parseInt(pageNo) || 1;
+    const limit = parseInt(pageLimit);
+    const skip = (page - 1) * limit;
+
+    return data.slice(skip, skip + limit);
 }
 
 //@function for hash the password
@@ -76,6 +98,8 @@ const endYear = function(year){
 //@exports
 module.exports = {  escapeString,
                     pagination,
+                    asyncPagination,
+                    syncPagination,
                     hashedPassword,
                     varifyPassword,
                     generateAuthToken,

@@ -6,9 +6,9 @@ const { ObjectId } = require('mongodb');
 const { Leave, 
         TotalLeaveOfUser } = require('../models/modelExporter');
 const { escapeString, 
-        pagination, 
+        asyncPagination, 
         startYear,
-        endYear} = require('../utils/common');
+        endYear } = require('../utils/common');
 const { isValidObjectId } = require('mongoose');
 
 //@desc display all Leave
@@ -156,7 +156,7 @@ const allLeave = asyncHandler(async(req, res) => {
             }
             leaves = leaves.sort(sortBy);
     
-            leaves = await pagination(page, limit, leaves);
+            leaves = await asyncPagination(page, limit, leaves);
     
             res.status(200).json({ message : `${leaves.length} leaves found`, data : leaves });
         
