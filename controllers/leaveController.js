@@ -121,7 +121,7 @@ const allLeave = asyncHandler(async(req, res) => {
 
         if (req.account && req.account.role) {
 
-            const { id, year, page, limit, sort} = req.query;
+            let { id, year, page, limit, sort} = req.query;
 
             const queryObject = {};
 
@@ -141,8 +141,13 @@ const allLeave = asyncHandler(async(req, res) => {
                 queryObject.employeeId = id;
             }
     
-            if(year){
-                //@year wise
+            if(year || !year){
+
+                //@default current year
+                if(!year){
+                    year = new Date().getFullYear();
+                }
+
                 queryObject.startdate = { $gte : startYear(year) };
                 queryObject.enddate = { $lte : endYear(year) };
             }
